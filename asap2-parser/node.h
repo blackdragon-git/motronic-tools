@@ -769,8 +769,8 @@ public:
     void visit(NRecordLayout* elem) { recordLayouts[elem->id.name] = elem; }
 
     // inner statements
-    void visit(NConstant* elem) { printf("NConstant is invalide in this context!\n"); }
-    void visit(NVariable* elem) { printf("NVariable is invalide in this context!\n"); }
+    void visit(NConstant* elem) { printf("NConstant is invalid in this context!\n"); }
+    void visit(NVariable* elem) { printf("NVariable is invalid in this context!\n"); }
 
 private:
     void buildMaps()
