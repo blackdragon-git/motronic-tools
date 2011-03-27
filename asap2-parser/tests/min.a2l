@@ -1,0 +1,519 @@
+ASAP2_VERSION  1 3
+/* Erstellt von DAMOS++ V1.17 */
+/begin PROJECT X505R_24c2_1 "4019.XX"
+  /begin HEADER ""
+    VERSION    "X505R_24c2_1"
+    PROJECT_NO X505R_24c2_1
+  /end HEADER
+
+  /begin MODULE DIM ""
+
+  /begin MOD_PAR "4019.XX"
+    VERSION "PrV = X24c2 mit 5r"
+    ADDR_EPK 0x810005
+    EPK "41/1/ME7.5/5/4019.XX//X24c2/Dst5r/280102/"
+    CUSTOMER_NO "5"
+    USER ""
+    PHONE_NO ""
+    CPU_TYPE "S80166"
+    ECU "ME7.5"
+    /begin MEMORY_SEGMENT Pst800000 "" CODE EPROM EXTERN 0x800000 0x10000 -1 -1 -1 -1 -1 
+    /begin IF_DATA ETK ADDRESS_MAPPING /*orig_adr:*/0x800000 /*mapping_adr:*/0x800000 /*length:*/0x10000 /end IF_DATA
+    /end MEMORY_SEGMENT
+
+    /begin MEMORY_SEGMENT Pst820000 "" CODE EPROM EXTERN 0x820000 0x6A00 -1 -1 -1 -1 -1 
+    /begin IF_DATA ETK ADDRESS_MAPPING /*orig_adr:*/0x820000 /*mapping_adr:*/0x820000 /*length:*/0x6A00 /end IF_DATA
+    /end MEMORY_SEGMENT
+
+    /begin MEMORY_SEGMENT Pst830000 "" CODE EPROM EXTERN 0x830000 0x50000 -1 -1 -1 -1 -1 
+    /begin IF_DATA ETK ADDRESS_MAPPING /*orig_adr:*/0x830000 /*mapping_adr:*/0x830000 /*length:*/0x50000 /end IF_DATA
+    /end MEMORY_SEGMENT
+
+    /begin MEMORY_SEGMENT Pst880000 "" CODE EPROM EXTERN 0x880000 0x80000 -1 -1 -1 -1 -1 
+    /begin IF_DATA ETK ADDRESS_MAPPING /*orig_adr:*/0x880000 /*mapping_adr:*/0x880000 /*length:*/0x80000 /end IF_DATA
+    /end MEMORY_SEGMENT
+
+    /begin MEMORY_SEGMENT Dst810000 "" DATA EPROM EXTERN 0x810000 0x10000 -1 -1 -1 -1 -1 
+    /begin IF_DATA ETK ADDRESS_MAPPING /*orig_adr:*/0x810000 /*mapping_adr:*/0x810000 /*length:*/0x10000 /end IF_DATA
+    /end MEMORY_SEGMENT
+
+    /begin MEMORY_SEGMENT Dst826A00 "" DATA EPROM EXTERN 0x826A00 0x9600 -1 -1 -1 -1 -1 
+    /begin IF_DATA ETK ADDRESS_MAPPING /*orig_adr:*/0x826A00 /*mapping_adr:*/0x826A00 /*length:*/0x9600 /end IF_DATA
+    /end MEMORY_SEGMENT
+
+
+
+    SYSTEM_CONSTANT "ANZ_VARTAB" "258"
+    SYSTEM_CONSTANT "ANZ_VARTABC" "258"
+    SYSTEM_CONSTANT "EPK_MAX_LEN" "80"
+    SYSTEM_CONSTANT "FPPANZ" "28"
+    SYSTEM_CONSTANT "SK_ME75" "1"
+    SYSTEM_CONSTANT "SK_PECC650" "1"
+    SYSTEM_CONSTANT "SK_UMHC05" "1"
+    SYSTEM_CONSTANT "SWOFFDL_REQUEST_MASK" "8191"
+    SYSTEM_CONSTANT "SY_2HFM" "0"
+    SYSTEM_CONSTANT "SY_2SG" "0"
+    SYSTEM_CONSTANT "SY_2SGHST" "0"
+    SYSTEM_CONSTANT "SY_2SLS" "0"
+    SYSTEM_CONSTANT "SY_2TEV" "0"
+    SYSTEM_CONSTANT "SY_AAU" "0"
+    SYSTEM_CONSTANT "SY_AAV" "1"
+    SYSTEM_CONSTANT "SY_ABGKL" "0"
+    SYSTEM_CONSTANT "SY_ABGY" "0"
+    SYSTEM_CONSTANT "SY_ABMZND" "0"
+    SYSTEM_CONSTANT "SY_ADR" "0"
+    SYSTEM_CONSTANT "SY_AEKPBI" "0"
+    SYSTEM_CONSTANT "SY_AGR" "0"
+    SYSTEM_CONSTANT "SY_AGRKOMP" "0"
+    SYSTEM_CONSTANT "SY_AGR_DSS" "0"
+    SYSTEM_CONSTANT "SY_AIRBAG" "1"
+    SYSTEM_CONSTANT "SY_ALLRAD_NIVEAU" "0"
+    SYSTEM_CONSTANT "SY_ASG" "0"
+  /end MOD_PAR
+
+  /begin MOD_COMMON ""
+    BYTE_ORDER MSB_LAST
+    ALIGNMENT_BYTE 1
+    ALIGNMENT_WORD 2
+    ALIGNMENT_LONG 2
+    
+  /end MOD_COMMON
+
+/begin CHARACTERISTIC
+
+    A0
+    "Übertragungsfunktionskoeffizient"
+    VALUE
+    0x816010
+    KwSw
+    0.1249981
+    fak_sw_b0p0625
+    -0.06250000
+    0.06249809
+
+    FORMAT "%10.8"
+    
+    /begin IF_DATA ETK  DP_BLOB 0x816010  0x2  /end IF_DATA
+/end CHARACTERISTIC
+
+/begin CHARACTERISTIC
+
+    FMDGENTA
+    "Generatormoment Temperaturanteil"
+    CURVE
+    0x8114B1
+    KlAUbSstUbWUb
+    1.992
+    rel_ub_b2p0
+    0.00
+    1.992
+
+    FORMAT "%5.3"
+    
+    /begin IF_DATA ETK  DP_BLOB 0x8114B1  0xD  /end IF_DATA
+    /begin AXIS_DESCR
+
+        STD_AXIS
+        tans
+        temp_ub_q0p75_o48
+        6
+        -48.00
+        143.3
+
+        FORMAT "%5.1"
+        DEPOSIT ABSOLUTE
+
+    /end AXIS_DESCR
+
+/end CHARACTERISTIC
+
+/begin CHARACTERISTIC
+
+    FZWKHMX
+    "Normierung für Faktor Momentenreserve Katheizen"
+    VALUE
+    0x812028
+    KwUb
+    1.992
+    fak_ub_b2
+    0.00
+    1.992
+
+    FORMAT "%5.3"
+    
+    /begin IF_DATA ETK  DP_BLOB 0x812028  0x1  /end IF_DATA
+/end CHARACTERISTIC
+
+/begin CHARACTERISTIC
+
+    FZWWLRLN
+    "Wichtung Delta-Zündwinkel im Warmlauf"
+    MAP
+    0x81226C
+    GkfWUb
+    1.992
+    fak_ub_b2
+    0.00
+    1.992
+
+    FORMAT "%5.3"
+    
+    /begin IF_DATA ETK  DP_BLOB 0x81226C  0x48  /end IF_DATA
+    /begin AXIS_DESCR
+
+        COM_AXIS
+        nmot
+        nmot_ub_q40
+        12
+        0.00
+        10200.
+
+        AXIS_PTS_REF SNM12ESUB
+
+    /end AXIS_DESCR
+
+    /begin AXIS_DESCR
+
+        COM_AXIS
+        rl
+        rel_ub_q0p75
+        6
+        0.00
+        191.3
+
+        AXIS_PTS_REF SRL06ESUB
+
+    /end AXIS_DESCR
+
+/end CHARACTERISTIC
+
+/begin CHARACTERISTIC
+
+    GFDLDN
+    "LLR: Gewichtungsfaktor für D-Verstärkung auf Luftpfad"
+    CURVE
+    0x81130B
+    GklWUb
+    0.9961
+    rel_ub_b1p0
+    0.00
+    0.9961
+
+    FORMAT "%6.4"
+    
+    /begin IF_DATA ETK  DP_BLOB 0x81130B  0x6  /end IF_DATA
+    /begin AXIS_DESCR
+
+        COM_AXIS
+        dns
+        nmotd_sb_q10
+        6
+        -1280.
+        1270.
+
+        AXIS_PTS_REF SNS06LLSB
+
+    /end AXIS_DESCR
+
+/end CHARACTERISTIC
+
+/begin CHARACTERISTIC
+
+    KFABAK
+    "Aufteilungsfaktor Wandfilm bei BA"
+    MAP
+    0x8190CC
+    GkfWUb
+    0.9961
+    fak_ub_b1
+    0.00
+    0.9961
+
+    FORMAT "%6.4"
+    
+    /begin IF_DATA ETK  DP_BLOB 0x8190CC  0x3F  /end IF_DATA
+    /begin AXIS_DESCR
+
+        COM_AXIS
+        tmot
+        temp_ub_q0p75_o48
+        9
+        -48.00
+        143.3
+
+        AXIS_PTS_REF STM09ESUB
+
+    /end AXIS_DESCR
+
+    /begin AXIS_DESCR
+
+        COM_AXIS
+        nmot
+        nmot_ub_q40
+        7
+        0.00
+        10200.
+
+        AXIS_PTS_REF SNM07ESUB
+
+    /end AXIS_DESCR
+
+/end CHARACTERISTIC
+
+/begin CHARACTERISTIC
+
+    KFATMKR
+    "Kennfeld stationäre Krümmerabgastemperatur f(nmot,rl)"
+    MAP
+    0x818582
+    KfAxUbAyUbSstxUbSstyUbWUb
+    1275.
+    temp_ub_q5_o50
+    -50.00
+    1225.
+
+    FORMAT "%5.0"
+    
+    /begin IF_DATA ETK  DP_BLOB 0x818582  0x52  /end IF_DATA
+    /begin AXIS_DESCR
+
+        STD_AXIS
+        nmot
+        nmot_ub_q40
+        8
+        0.00
+        10200.
+
+        FORMAT "%5.0"
+        DEPOSIT ABSOLUTE
+
+    /end AXIS_DESCR
+
+    /begin AXIS_DESCR
+
+        STD_AXIS
+        rl
+        rel_ub_q0p75
+        8
+        0.00
+        191.3
+
+        FORMAT "%5.1"
+        DEPOSIT ABSOLUTE
+
+    /end AXIS_DESCR
+
+/end CHARACTERISTIC
+
+/begin CHARACTERISTIC
+
+    KFATMLA_0_A
+    "Kennfeld Abgastemperatur-Korrektur = f(Lambda)"
+    MAP
+    0x8185D4
+    GkfWSb
+    1275.
+    temp_q5
+    -640.0
+    635.0
+
+    FORMAT "%5.1"
+    
+    /begin IF_DATA ETK  DP_BLOB 0x8185D4  0x24  /end IF_DATA
+    /begin AXIS_DESCR
+
+        COM_AXIS
+        ml_w
+        m_uw_b6553p5
+        6
+        0.00
+        6553.500
+
+        AXIS_PTS_REF SML06TMUW
+
+    /end AXIS_DESCR
+
+    /begin AXIS_DESCR
+
+        COM_AXIS
+        lamsbg_w
+        fak_uw_b16
+        6
+        0.00
+        15.99976
+
+        AXIS_PTS_REF SLX06TMUW
+
+    /end AXIS_DESCR
+
+/end CHARACTERISTIC
+
+/begin CHARACTERISTIC
+
+    KFBALB
+    "Faktor Beschleunigungsanreicherung Ladebereich"
+    MAP
+    0x819189
+    KfAxUbAyUbSstxUbSstyUbWUb
+    3.984
+    fak_q0p015625
+    0.00
+    3.984
+
+    FORMAT "%5.3"
+    
+    /begin IF_DATA ETK  DP_BLOB 0x819189  0x32  /end IF_DATA
+    /begin AXIS_DESCR
+
+        STD_AXIS
+        nmot
+        nmot_ub_q40
+        6
+        0.00
+        10200.
+
+        FORMAT "%5.0"
+        DEPOSIT ABSOLUTE
+
+    /end AXIS_DESCR
+
+    /begin AXIS_DESCR
+
+        STD_AXIS
+        rlp
+        rel_ub_q0p75
+        6
+        0.00
+        191.3
+
+        FORMAT "%5.1"
+        DEPOSIT ABSOLUTE
+
+    /end AXIS_DESCR
+
+/end CHARACTERISTIC
+
+/* FIX-AXIS */
+/begin CHARACTERISTIC
+
+    MZFREG_DAT_UC
+    ""
+    MAP
+    0x811936
+    KfWUb
+    255.0
+    dez
+    0.00
+    255.0
+
+    FORMAT "%5.1"
+    
+    /begin IF_DATA ETK  DP_BLOB 0x811936  0x80  /end IF_DATA
+    /begin AXIS_DESCR
+
+        FIX_AXIS
+        x_uc
+        dez
+        16
+        0.00
+        15.00
+
+        FORMAT "%5.2"
+        FIX_AXIS_PAR 0  0  16
+
+    /end AXIS_DESCR
+
+    /begin AXIS_DESCR
+
+        FIX_AXIS
+        y_uc
+        dez
+        8
+        0.00
+        7.000
+
+        FORMAT "%5.3"
+        FIX_AXIS_PAR 0  0  8
+
+    /end AXIS_DESCR
+
+/end CHARACTERISTIC
+
+/begin CHARACTERISTIC
+
+    NARASTG
+    "Drehzahlschwelle in hoeherem Gang fuer AR aktiv"
+    CURVE
+    0x8114F3
+    FklWUb
+    10200.
+    nmot_ub_q40
+    0.00
+    10200.
+
+    FORMAT "%5.0"
+    
+    /begin IF_DATA ETK  DP_BLOB 0x8114F3  0x6  /end IF_DATA
+    /begin AXIS_DESCR
+
+        FIX_AXIS
+        gangi
+        dez
+        6
+        1.000
+        6.000
+
+        FORMAT "%5.3"
+        FIX_AXIS_PAR 1  0  6
+
+    /end AXIS_DESCR
+
+/end CHARACTERISTIC
+
+/begin CHARACTERISTIC
+
+    REDABM
+    "Ev-Abschaltmuster für Momentenreduzierung"
+    MAP
+    0x810DDA
+    FkfNoShNoOffWUb
+    255.0
+    dez
+    0.00
+    255.0
+
+    FORMAT "%5.1"
+    
+    /begin IF_DATA ETK  DP_BLOB 0x810DDA  0x10  /end IF_DATA
+    /begin AXIS_DESCR
+
+        FIX_AXIS
+        evrbgn_one
+        dez
+        4
+        0.00
+        3.000
+
+        FORMAT "%5.3"
+        FIX_AXIS_PAR 0  0  4
+
+    /end AXIS_DESCR
+
+    /begin AXIS_DESCR
+
+        FIX_AXIS
+        redsol_one
+        dez
+        4
+        0.00
+        3.000
+
+        FORMAT "%5.3"
+        FIX_AXIS_PAR 0  0  4
+
+    /end AXIS_DESCR
+
+/end CHARACTERISTIC
+
+  /end MODULE
+/end PROJECT
