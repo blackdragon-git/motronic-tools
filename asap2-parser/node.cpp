@@ -47,7 +47,7 @@ AxisStyle NMap<NFixAxis>::axisStyle()
     return Fixed;
 }
 
-NBaseMap* createMap(const NIdentifier& name,
+NBaseMap* createMap(NIdentifier* id,
                     const std::string& description,
                     const NAddress& address,
                     const NIdentifier& recordLayout,
@@ -69,7 +69,7 @@ NBaseMap* createMap(const NIdentifier& name,
 
     NBaseMap* map;
     if (style1 == Extern) {
-        map = new NMap<NComAxis>(name,
+        map = new NMap<NComAxis>(id,
                                  description,
                                  address,
                                  recordLayout,
@@ -82,7 +82,7 @@ NBaseMap* createMap(const NIdentifier& name,
                                  dynamic_cast<const NComAxis&>(axis_2));
     }
     else if (style1 == Intern) {
-        map = new NMap<NStdAxis>(name,
+        map = new NMap<NStdAxis>(id,
                                  description,
                                  address,
                                  recordLayout,
@@ -95,7 +95,7 @@ NBaseMap* createMap(const NIdentifier& name,
                                  dynamic_cast<const NStdAxis&>(axis_2));
     }
     else if (style1 == Fixed) {
-        map = new NMap<NFixAxis>(name,
+        map = new NMap<NFixAxis>(id,
                                  description,
                                  address,
                                  recordLayout,
@@ -130,7 +130,7 @@ const NRecordLayout::FncValues& NRecordLayout::getFncValues() const
 }
 
 NRecordLayout* NRecordLayout::createRecordLayout(
-    const NIdentifier& name,
+    NIdentifier* id,
     NRecordLayout::FncValues* fncValues)
 {
     if (fncValues == NULL) {
@@ -139,29 +139,20 @@ NRecordLayout* NRecordLayout::createRecordLayout(
     }
 
     // the simplest case is only a FNC_VALUES record
-    NRecordLayout* recordLayout = new NRecordLayout(name);
+    NRecordLayout* recordLayout = new NRecordLayout(id);
     recordLayout->m_members[NRecordLayout::Fnc] = RecordPtr(fncValues);
 
     return recordLayout;
 }
-/*
-NRecordLayout* NRecordLayout::createRecordLayout(
-    const NIdentifier& name,
-    int NoAxisTypeX,
-    int ValAxisTypeX,
-    int AxisFlagsX)
-{
 
-}
-*/
 NRecordLayout* NRecordLayout::createRecordLayout(
-    const NIdentifier& name,
+    NIdentifier* id,
     int NoAxisTypeX,
     int ValAxisTypeX,
     int AxisFlagsX,
     NRecordLayout::FncValues* fncValues)
 {
-    NRecordLayout* recordLayout = new NRecordLayout(name);
+    NRecordLayout* recordLayout = new NRecordLayout(id);
 
     // a fixed curve may be defined without FNC_VALUES
     if (fncValues != NULL) {
@@ -175,7 +166,7 @@ NRecordLayout* NRecordLayout::createRecordLayout(
 }
 
 NRecordLayout* NRecordLayout::createRecordLayout(
-    const NIdentifier& name,
+    NIdentifier* id,
     int NoAxisTypeX,
     int ValAxisTypeX,
     int AxisFlagsX,
@@ -189,7 +180,7 @@ NRecordLayout* NRecordLayout::createRecordLayout(
         return NULL;
     }
 
-    NRecordLayout* recordLayout = new NRecordLayout(name);
+    NRecordLayout* recordLayout = new NRecordLayout(id);
 
     AxisLayout* xAxis = new AxisLayout(NoAxisTypeX, ValAxisTypeX, AxisFlagsX);
     AxisLayout* yAxis = new AxisLayout(NoAxisTypeY, ValAxisTypeY, AxisFlagsY);

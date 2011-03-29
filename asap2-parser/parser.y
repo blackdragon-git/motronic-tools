@@ -163,14 +163,14 @@ system_constant : TSYSTEM_CONSTANT TSTRING TSTRING
 	{
 		NExpression* expr = new NInteger(atol($3->c_str())); // should always be an integer
 		NIdentifier* ident = new NIdentifier(*$2);
-		$$ = new NConstant(*ident, *expr);
+		$$ = new NConstant(ident, *expr);
 	}
 	;
 
 var_defs :  /* empty */ { $$ = new StatementList(); } | var_defs var_def { $1->push_back($2); }
 	;
 
-var_def : ident expr { $$ = new NVariable(*$1); $$->assignmentExpr = $2; }
+var_def : ident expr { $$ = new NVariable($1); $$->assignmentExpr = $2; }
 	;
 
 numeric_list : /* empty */ { $$ = new ExpressionList(); } | numeric_list numeric { $1->push_back($2); }
@@ -265,7 +265,7 @@ characteristic : TLBRACE TCHARACTERISTIC // com-axis
 		{
 			printf ("\tcharacteristic-map: %s\n", $3->name.c_str());
 
-			$$ = /*new NMap<NComAxis>*/ createMap(*$3 /* name */,
+			$$ = /*new NMap<NComAxis>*/ createMap($3 /* name */,
 					*$4 /* description */,
 					*$6 /* address */,
 					*$7 /* recordLayout */,
@@ -296,7 +296,7 @@ characteristic : TLBRACE TCHARACTERISTIC // com-axis
 		{
 			printf ("\tcharacteristic-curve: %s\n", $3->name.c_str());
 
-			$$ = new NCurve(*$3 /* name */,
+			$$ = new NCurve($3 /* name */,
 					*$4 /* description */,
 					*$6 /* address */,
 					*$7 /* recordLayout */,
@@ -324,7 +324,7 @@ characteristic : TLBRACE TCHARACTERISTIC // com-axis
 		{
 			printf ("\tcharacteristic-value: %s %s\n", $3->name.c_str(), $4->c_str());
 
-			$$ = new NValue(*$3 /* name */,
+			$$ = new NValue($3 /* name */,
 					*$4 /* description */,
 					*$6 /* address */,
 					*$7 /* recordLayout */,
@@ -352,7 +352,7 @@ characteristic : TLBRACE TCHARACTERISTIC // com-axis
 		{
 			printf ("\tcharacteristic-valblk: %s number: %d\n", $3->name.c_str(), $14);
 
-			$$ = new NValBlk(*$3 /* name */,
+			$$ = new NValBlk($3 /* name */,
 					*$4 /* description */,
 					*$6 /* address */,
 					*$7 /* recordLayout */,
@@ -381,7 +381,7 @@ characteristic : TLBRACE TCHARACTERISTIC // com-axis
 		{
 			printf ("\tcharacteristic-ascii: %s number: %d\n", $3->name.c_str(), $14);
 
-			$$ = new NCharacteristicText(*$3 /* name */,
+			$$ = new NCharacteristicText($3 /* name */,
 					*$4 /* description */,
 					*$6 /* address */,
 					*$7 /* recordLayout */,
@@ -410,7 +410,7 @@ measurement :	TLBRACE TMEASUREMENT
 		{
 			printf ("\tmeasurement-bit: %s\n", $3->name.c_str());
 
-			$$ = new NMeasurementBit(*$3,	// name
+			$$ = new NMeasurementBit($3,	// name
 						*$4,	// description
 						$5,	// dataType
 						atoi($7->c_str()), // int1
@@ -437,7 +437,7 @@ measurement :	TLBRACE TMEASUREMENT
 		{
 			printf ("\tmeasurement-value: %s\n", $3->name.c_str());
 
-			$$ = new NMeasurementValue(*$3,	// name
+			$$ = new NMeasurementValue($3,	// name
 						*$4,	// description
 						$5,	// dataType
 						atoi($7->c_str()), // int1
@@ -465,7 +465,7 @@ measurement :	TLBRACE TMEASUREMENT
 		{
 			printf ("\tmeasurement-value: %s\n", $3->name.c_str());
 
-			$$ = new NMeasurementValue(*$3,	// name
+			$$ = new NMeasurementValue($3,	// name
 						*$4,	// description
 						$5,	// dataType
 						atoi($7->c_str()), // int1
@@ -493,7 +493,7 @@ measurement :	TLBRACE TMEASUREMENT
 		{
 			printf ("\tmeasurement-array: %s\n", $3->name.c_str());
 
-			$$ = new NMeasurementArray(*$3,	// name
+			$$ = new NMeasurementArray($3,	// name
 						*$4,	// description
 						$5,	// dataType
 						atoi($7->c_str()), // int1
@@ -575,7 +575,7 @@ axis_pts :	TLBRACE TAXIS_PTS
 		TRBRACE TAXIS_PTS
 		{
 			printf("\taxis-pts: %s %s\n", $3->name.c_str(), $4->c_str());
-			$$ = new NAxisPts(*$3,	// name
+			$$ = new NAxisPts($3,	// name
 					*$4,	// description
 					*$5,	// address
 					*$6,	// unit
@@ -593,7 +593,7 @@ record_layout : TLBRACE TRECORD_LAYOUT ident
 			fnc_values
 		TRBRACE TRECORD_LAYOUT
 		{
-			$$ = NRecordLayout::createRecordLayout(*$3, // name
+			$$ = NRecordLayout::createRecordLayout($3, // name
 				$<fncValues>4); // fnc_values
 			if ($$ == NULL) { YYERROR; }
 		}
@@ -604,7 +604,7 @@ record_layout : TLBRACE TRECORD_LAYOUT ident
 			fnc_values
 		TRBRACE TRECORD_LAYOUT
 		{
-			$$ = NRecordLayout::createRecordLayout(*$3, // name
+			$$ = NRecordLayout::createRecordLayout($3, // name
 				$6, // no-type X
 				$9, // val-type X
 				0, // TODO flags
@@ -622,7 +622,7 @@ record_layout : TLBRACE TRECORD_LAYOUT ident
 			fnc_values
 		TRBRACE TRECORD_LAYOUT
 		{
-			$$ = NRecordLayout::createRecordLayout(*$3, // name
+			$$ = NRecordLayout::createRecordLayout($3, // name
 				$6, // no-type X
 				$12, // val-type X
 				0, // TODO flags
@@ -656,7 +656,7 @@ compu_method :	TLBRACE TCOMPU_METHOD
 			printf("\tcompu_method: %s %s\n", $3->name.c_str(), $4->c_str());
 
 			NFormat* format = new NFormat(*$6);
-			$$ = new NCompuMethod(*$3,	// name
+			$$ = new NCompuMethod($3,	// name
 						*$4,	// description
 						*format, // format
 						*$7,	// unit
@@ -765,7 +765,7 @@ function :	TLBRACE TFUNCTION
 		TRBRACE TFUNCTION
 		{
 			printf("\tfunction: %s %s\n", $3->name.c_str(), $4->c_str());
-			$$ = new NFunction(*$3, *$4, *$5, *$6, *$7, *$8, *$9, *$10);
+			$$ = new NFunction($3, *$4, *$5, *$6, *$7, *$8, *$9, *$10);
 		}
 	; // function
 

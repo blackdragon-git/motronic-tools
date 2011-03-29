@@ -46,7 +46,7 @@ void XdfGen::createCategorys()
 
     const FunctionHashMap& functions = m_module.functions;
     BOOST_FOREACH (FunctionHashMap::value_type i, functions) {
-        const std::string& name = i.second->id.name;
+        const std::string& name = i.second->id->name;
 
         m_categorys[name] = n; // save our xdf-id
         m_xdf << "<CATEGORY index=\"0x" << n << "\" "
@@ -82,8 +82,8 @@ void XdfGen::createCatRefsForMap(const NIdentifier& id)
     const FunctionHashMap& functions = m_module.functions;
     BOOST_FOREACH (FunctionHashMap::value_type i, functions) {
 
-        createCategoryReferences(id, i.second->id, i.second->def_characteristic);
-        createCategoryReferences(id, i.second->id, i.second->ref_characteristic);
+        createCategoryReferences(id, *i.second->id, i.second->def_characteristic);
+        createCategoryReferences(id, *i.second->id, i.second->ref_characteristic);
     }
 }
 
@@ -223,10 +223,10 @@ unsigned int XdfGen::handleAxis(const NAxis& axis, // TODO add col or row
 // all top-level statements
 void XdfGen::visit(/*NMap*/NBaseMap* elem)
 {
-    std::cout << "visiting NMap " << elem->id.name << std::endl;
+    std::cout << "visiting NMap " << elem->id->name << std::endl;
 
     m_xdf << "<XDFTABLE uniqueid=\"0x0\" flags=\"0x0\">" << "\n"
-          << "<title>" << elem->id.name << "</title>" << "\n"
+          << "<title>" << elem->id->name << "</title>" << "\n"
           << "<description>" << elem->description << "</description>" << "\n"; // TODO: umlaute!
 
     unsigned int offset = 0;
@@ -250,7 +250,7 @@ void XdfGen::visit(/*NMap*/NBaseMap* elem)
     const NRecordLayout* recordLayout = m_module.recordLayouts.at(elem->m_recordLayout.name);
 
     if (!recordLayout->hasFncValues()) {
-        std::cerr << "NRecordLayout for map: " << elem->id.name
+        std::cerr << "NRecordLayout for map: " << elem->id->name
                   << " should have an FNC_VALUES entry!" << std::endl;
         throw std::exception();
     }
@@ -264,7 +264,7 @@ void XdfGen::handleComMap(const NMap<NComAxis>* comMap)
 {
     assert(comMap != NULL);
 
-    createCatRefsForMap(comMap->id);
+    createCatRefsForMap(*comMap->id);
     try {
         handleAxis(comMap->axis_1, /*Extern,*/ comMap->address.value, "x");
         handleAxis(comMap->axis_2, /*Extern,*/ comMap->address.value, "y");
@@ -280,7 +280,7 @@ unsigned int XdfGen::handleStdMap(const NMap<NStdAxis>* stdMap)
     assert(stdMap != NULL);
     unsigned int offset = 2, axisAddr; // the first two bytes to describe the axis length
 
-    createCatRefsForMap(stdMap->id);
+    createCatRefsForMap(*stdMap->id);
     try {
         axisAddr = stdMap->address.value + offset;
         offset += handleAxis(stdMap->axis_1, /*Intern,*/ axisAddr, "x");
@@ -304,7 +304,7 @@ void XdfGen::handleFixMap(const NMap<NFixAxis>* fixMap)
 
 void XdfGen::visit(NCurve* elem)
 {
-    std::cout << "visiting NCurve " << elem->id.name << std::endl;
+    std::cout << "visiting NCurve " << elem->id->name << std::endl;
 
 }
 
