@@ -20,6 +20,7 @@
 #include <vector>
 #include <utility>
 #include <cstdio>
+#include <boost/checked_delete.hpp>
 #include <boost/foreach.hpp>
 #include <boost/unordered_map.hpp>
 #include <boost/shared_ptr.hpp>
@@ -168,7 +169,6 @@ public:
 
 class NStatement : public Node {
 public:
-//    const NIdentifier& id;
     owner_ptr<NIdentifier, Node> id;
     NStatement(NIdentifier* id) : id(id, this) { }
 
@@ -181,13 +181,20 @@ public:
     //	StatementHashMap statements;
 
     NBlock() { }
+
+    ~NBlock()
+    {
+        BOOST_FOREACH (StatementList::value_type i, statements) {
+            boost::checked_delete(i);
+        }
+    }
 };
 
 
 
 class NVariable : public NStatement {
 public:
-    NExpression* assignmentExpr;
+    NExpression* assignmentExpr; // consider this as weak ref
 
     NVariable(NIdentifier* id) : NStatement(id) { }
 
@@ -215,18 +222,23 @@ public:
 
 class NAxis : public NExpression { // declaration
 public:
-    const NIdentifier& dataType;
-    const NIdentifier& m_compuMethod;
+    owner_ptr<NIdentifier, Node> m_dataType;
+    owner_ptr<NIdentifier, Node> m_compuMethod;
     int length;
     double min;
     double max;
 
-    NAxis(const NIdentifier& ident,
-          const NIdentifier& compuMethod,
-          int length,
-          double min,
-          double max) :
-        dataType(ident), m_compuMethod(compuMethod), length(length), min(min), max(max) { }
+    NAxis(
+        NIdentifier* ident,
+        NIdentifier* compuMethod,
+        int length,
+        double min,
+        double max) :
+        m_dataType(ident, this),
+        m_compuMethod(compuMethod, this),
+        length(length),
+        min(min),
+        max(max) { }
 
     AxisStyle getAxisStyle() const { return m_axisStyle; }
 
@@ -238,13 +250,15 @@ class NComAxis : public NAxis { // declaration
 public:
     const NIdentifier& axis_pts;
 
-    NComAxis(const NIdentifier& dataType,
-             const NIdentifier& compuMethod,
-             int length,
-             double min,
-             double max,
-             const NIdentifier& axis_pts) :
-        NAxis(dataType, compuMethod, length, min, max), axis_pts(axis_pts)
+    NComAxis(
+        NIdentifier* dataType,
+        NIdentifier* compuMethod,
+        int length,
+        double min,
+        double max,
+        const NIdentifier& axis_pts) :
+        NAxis(dataType, compuMethod, length, min, max),
+        axis_pts(axis_pts)
     { m_axisStyle = Extern; }
 };
 
@@ -253,13 +267,15 @@ public:
     const NFormat& format;
     /* NDeposite */
 
-    NStdAxis(const NIdentifier& dataType,
-             const NIdentifier& compuMethod,
-             int length,
-             double min,
-             double max,
-             const NFormat& format) :
-        NAxis(dataType, compuMethod, length, min, max), format(format)
+    NStdAxis(
+        NIdentifier* dataType,
+        NIdentifier* compuMethod,
+        int length,
+        double min,
+        double max,
+        const NFormat& format) :
+        NAxis(dataType, compuMethod, length, min, max),
+        format(format)
     { m_axisStyle = Intern; }
 };
 
@@ -268,13 +284,15 @@ public:
     const NFormat& format;
     /* FIX_AXIS_PAR */
 
-    NFixAxis(const NIdentifier& dataType,
-             const NIdentifier& compuMethod,
-             int length,
-             double min,
-             double max,
-             const NFormat& format) :
-        NAxis(dataType, compuMethod, length, min, max), format(format)
+    NFixAxis(
+        NIdentifier* dataType,
+        NIdentifier* compuMethod,
+        int length,
+        double min,
+        double max,
+        const NFormat& format) :
+        NAxis(dataType, compuMethod, length, min, max),
+        format(format)
     { m_axisStyle = Fixed; }
 };
 //////////////////

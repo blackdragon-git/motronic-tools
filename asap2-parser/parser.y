@@ -524,7 +524,7 @@ std_axis :	TLBRACE TAXIS_DESCR
 		TRBRACE TAXIS_DESCR
 		{
 			printf ("\tstd-axis\n");
-			$$ = new NStdAxis(*$4, *$5, atol($6->c_str()), atof($7->c_str()), atof($8->c_str()), *$9);
+			$$ = new NStdAxis($4, $5, atol($6->c_str()), atof($7->c_str()), atof($8->c_str()), *$9);
 		}
 	;
 
@@ -539,7 +539,7 @@ com_axis :	TLBRACE TAXIS_DESCR
 		TRBRACE TAXIS_DESCR
 		{
 			printf ("\tcom-axis\n");
-			$$ = new NComAxis(*$4, *$5, atol($6->c_str()), atof($7->c_str()), atof($8->c_str()), *$10);
+			$$ = new NComAxis($4, $5, atol($6->c_str()), atof($7->c_str()), atof($8->c_str()), *$10);
 		}
 	;
 
@@ -555,7 +555,7 @@ fix_axis :	TLBRACE TAXIS_DESCR
 		TRBRACE TAXIS_DESCR
 		{
 			printf ("\tfix-axis\n");
-			$$ = new NFixAxis(*$4, *$5, atol($6->c_str()), atof($7->c_str()), atof($8->c_str()), *$9);
+			$$ = new NFixAxis($4, $5, atol($6->c_str()), atof($7->c_str()), atof($8->c_str()), *$9);
 		}
 	;
 

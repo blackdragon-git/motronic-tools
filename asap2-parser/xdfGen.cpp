@@ -151,7 +151,7 @@ unsigned int XdfGen::handleAxis(const NAxis& axis, // TODO add col or row
                                 unsigned int baseAddr, //const NAddress& baseAddr,
                                 const char* name)
 {
-    const NMeasurement* measurement = m_module.measurements.at(axis.dataType.name);
+    const NMeasurement* measurement = m_module.measurements.at(axis.m_dataType->name);
     assert(measurement != NULL);
 
     short typeSize;
@@ -186,7 +186,7 @@ unsigned int XdfGen::handleAxis(const NAxis& axis, // TODO add col or row
 
     }
 
-    const NCompuMethod* compuMethod = m_module.compuMethods.at(axis.m_compuMethod.name);
+    const NCompuMethod* compuMethod = m_module.compuMethods.at(axis.m_compuMethod->name);
     assert(compuMethod != NULL);
 
     //generate:
