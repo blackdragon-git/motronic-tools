@@ -265,17 +265,17 @@ characteristic : TLBRACE TCHARACTERISTIC // com-axis
 		{
 			printf ("\tcharacteristic-map: %s\n", $3->name.c_str());
 
-			$$ = /*new NMap<NComAxis>*/ createMap($3 /* name */,
+			$$ = createMap($3 /* name */,
 					*$4 /* description */,
-					*$6 /* address */,
-					*$7 /* recordLayout */,
+					$6 /* address */,
+					$7 /* recordLayout */,
 					atof($8->c_str()) /* scale */,
-					*$9 /* type */,
+					$9 /* type */,
 					atof($10->c_str()) /* min */,
 					atof($11->c_str()) /* max */,
-					*$12 /* format */,
-					*$14 /* axis_1 */,
-					*$15 /* axis_2 */);
+					$12 /* format */,
+					$14 /* axis_1 */,
+					$15 /* axis_2 */);
 			if ($$ == NULL) { YYERROR; }
 		}
 	|
@@ -298,14 +298,14 @@ characteristic : TLBRACE TCHARACTERISTIC // com-axis
 
 			$$ = new NCurve($3 /* name */,
 					*$4 /* description */,
-					*$6 /* address */,
-					*$7 /* recordLayout */,
+					$6 /* address */,
+					$7 /* recordLayout */,
 					atof($8->c_str()) /* scale */,
-					*$9 /* type */,
+					$9 /* type */,
 					atof($10->c_str()) /* min */,
 					atof($11->c_str()) /* max */,
-					*$12 /* format */,
-					*$14 /* axis_1 */);
+					$12 /* format */,
+					$14 /* axis_1 */);
 		}
 	|
 		TLBRACE TCHARACTERISTIC
@@ -326,13 +326,13 @@ characteristic : TLBRACE TCHARACTERISTIC // com-axis
 
 			$$ = new NValue($3 /* name */,
 					*$4 /* description */,
-					*$6 /* address */,
-					*$7 /* recordLayout */,
+					$6 /* address */,
+					$7 /* recordLayout */,
 					atof($8->c_str()) /* scale */,
-					*$9 /* type */,
+					$9 /* type */,
 					atof($10->c_str()) /* min */,
 					atof($11->c_str()) /* max */,
-					*$12 /* format */);
+					$12 /* format */);
 		}
 	|
 		TLBRACE TCHARACTERISTIC
@@ -354,13 +354,13 @@ characteristic : TLBRACE TCHARACTERISTIC // com-axis
 
 			$$ = new NValBlk($3 /* name */,
 					*$4 /* description */,
-					*$6 /* address */,
-					*$7 /* recordLayout */,
+					$6 /* address */,
+					$7 /* recordLayout */,
 					atof($8->c_str()) /* scale */,
-					*$9 /* type */,
+					$9 /* type */,
 					atof($10->c_str()) /* min */,
 					atof($11->c_str()) /* max */,
-					*$12 /* format */,
+					$12 /* format */,
 					$14);	// number
 		}
 	|
@@ -383,13 +383,13 @@ characteristic : TLBRACE TCHARACTERISTIC // com-axis
 
 			$$ = new NCharacteristicText($3 /* name */,
 					*$4 /* description */,
-					*$6 /* address */,
-					*$7 /* recordLayout */,
+					$6 /* address */,
+					$7 /* recordLayout */,
 					atof($8->c_str()) /* scale */,
-					*$9 /* type */,
+					$9 /* type */,
 					atof($10->c_str()) /* min */,
 					atof($11->c_str()) /* max */,
-					*$12 /* format */,
+					$12 /* format */,
 					$14);	// number
 		}
 	; // characteristic

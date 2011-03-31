@@ -299,162 +299,173 @@ public:
 
 class NCharacteristic : public NStatement { // declaration
 public:
-    //	const NIdentifier& name;
     std::string description;
-    /*	std::string*/ const NAddress& address; // TO/DO: change type
-    const NIdentifier& m_recordLayout; // TO/DO: rename rec_layout
+    owner_ptr<NAddress, Node> m_address;
+    owner_ptr<NIdentifier, Node> m_recordLayout;
     double scale;
-    const NIdentifier& type;
+    owner_ptr<NIdentifier, Node> m_type;
     double min;
     double max;
-    const NFormat& format;	// TODO: NCharacteristicText needs only sometimes a format tag
-    // if_data
+    owner_ptr<NFormat, Node> m_format; // TODO: NCharacteristicText needs only sometimes a format tag; will result in:
+    // parser: owner_ptr.hpp:37: owner_ptr<T, P>::owner_ptr(T*, const P*) [with T = NFormat, P = Node]: Assertion `m_p != 0' failed.
 
-    NCharacteristic(NIdentifier* id,
-                    const std::string& description,
-                    /*	const std::string&*/ const NAddress& address,
-                    const NIdentifier& recordLayout,
-                    double scale,
-                    const NIdentifier& type,
-                    double min,
-                    double max,
-                    const NFormat& format) :
-        NStatement(id), description(description), address(address),
-        m_recordLayout(recordLayout), scale(scale), type(type), min(min),
-        max(max), format(format) { }
-
-    //void accept(Visitor& v) { v.visit(this); }
+    NCharacteristic(
+        NIdentifier* id,
+        const std::string& description,
+        NAddress* address,
+        NIdentifier* recordLayout,
+        double scale,
+        NIdentifier* type,
+        double min,
+        double max,
+        NFormat* format) :
+        NStatement(id), description(description), m_address(address, this),
+        m_recordLayout(recordLayout, this), scale(scale), m_type(type, this),
+        min(min), max(max), m_format(format, this)
+    { }
 };
 
 class NBaseMap : public NCharacteristic {
 public:
-    NBaseMap(NIdentifier* id,
-             const std::string& description,
-             const NAddress& address,
-             const NIdentifier& recordLayout,
-             double scale,
-             const NIdentifier& type,
-             double min,
-             double max,
-             const NFormat& format) :
-        NCharacteristic(id, description, address, recordLayout, scale, type, min, max, format) { }
+    NBaseMap(
+        NIdentifier* id,
+        const std::string& description,
+        NAddress* address,
+        NIdentifier* recordLayout,
+        double scale,
+        NIdentifier* type,
+        double min,
+        double max,
+        NFormat* format) :
+        NCharacteristic(id, description, address, recordLayout, scale, type, min, max, format)
+    { }
 
     void accept(Visitor& v) { v.visit(this); }
-private:
-    //        static const AxisStyle m_axisStyle;
+
 public:
     virtual AxisStyle axisStyle() = 0;
 };
 
-NBaseMap* createMap(NIdentifier* id,
-                    const std::string& description,
-                    const NAddress& address,
-                    const NIdentifier& recordLayout,
-                    double scale,
-                    const NIdentifier& type,
-                    double min,
-                    double max,
-                    const NFormat& format,
-                    const NAxis& axis_1,
-                    const NAxis& axis_2);
+NBaseMap* createMap(
+    NIdentifier* id,
+    const std::string& description,
+    NAddress* address,
+    NIdentifier* recordLayout,
+    double scale,
+    NIdentifier* type,
+    double min,
+    double max,
+    NFormat* format,
+    NAxis* axis_1,
+    NAxis* axis_2);
 
 template<class T>
 class NMap : public NBaseMap { // declaration
 public:
-    const T & axis_1;
-    const T & axis_2;
+    owner_ptr<T, Node> m_axis_1;
+    owner_ptr<T, Node> m_axis_2;
     typedef T axis_type;
 
     // achsen müssen den gleichen typen besitzen!
-    NMap(NIdentifier* id,
-         const std::string& description,
-         const NAddress& address,
-         const NIdentifier& recordLayout,
-         double scale,
-         const NIdentifier& type,
-         double min,
-         double max,
-         const NFormat& format,
-         const T & axis_1,
-         const T & axis_2) :
+    NMap(
+        NIdentifier* id,
+        const std::string& description,
+        NAddress* address,
+        NIdentifier* recordLayout,
+        double scale,
+        NIdentifier* type,
+        double min,
+        double max,
+        NFormat* format,
+        T * axis_1,
+        T * axis_2) :
         NBaseMap(id, description, address, recordLayout, scale, type, min, max, format),
-        axis_1(axis_1), axis_2(axis_2) { }
+        m_axis_1(axis_1, this), m_axis_2(axis_2, this)
+    { }
 
     virtual AxisStyle axisStyle();
 };
 
 class NCurve : public NCharacteristic { // declaration
 public:
-    const NAxis& axis_1;
+    owner_ptr<NAxis, Node> m_axis_1;
 
-    NCurve(NIdentifier* id,
-           const std::string& description,
-           const NAddress& address,
-           const NIdentifier& recordLayout,
-           double scale,
-           const NIdentifier& type,
-           double min,
-           double max,
-           const NFormat& format,
-           const NAxis& axis_1) :
+    NCurve(
+        NIdentifier* id,
+        const std::string& description,
+        NAddress* address,
+        NIdentifier* recordLayout,
+        double scale,
+        NIdentifier* type,
+        double min,
+        double max,
+        NFormat* format,
+        NAxis* axis_1) :
         NCharacteristic(id, description, address, recordLayout, scale, type, min, max, format),
-        axis_1(axis_1) { }
+        m_axis_1(axis_1, this)
+    { }
 
     void accept(Visitor& v) { v.visit(this); }
 };
 
 class NValue : public NCharacteristic { // declaration
 public:
-    NValue(NIdentifier* id,
-           const std::string& description,
-           const NAddress& address,
-           const NIdentifier& recordLayout,
-           double scale,
-           const NIdentifier& type,
-           double min,
-           double max,
-           const NFormat& format) :
-        NCharacteristic(id, description, address, recordLayout, scale, type, min, max, format) { }
+    NValue(
+        NIdentifier* id,
+        const std::string& description,
+        NAddress* address,
+        NIdentifier* recordLayout,
+        double scale,
+        NIdentifier* type,
+        double min,
+        double max,
+        NFormat* format) :
+        NCharacteristic(id, description, address, recordLayout, scale, type, min, max, format)
+    { }
 
     void accept(Visitor& v) { v.visit(this); }
 };
 
 class NValBlk : public NCharacteristic { // declaration
 public:
-    int number;
+    int m_number;
 
-    NValBlk(NIdentifier* id,
-            const std::string& description,
-            const NAddress& address,
-            const NIdentifier& recordLayout,
-            double scale,
-            const NIdentifier& type,
-            double min,
-            double max,
-            const NFormat& format,
-            int number) :
+    NValBlk(
+        NIdentifier* id,
+        const std::string& description,
+        NAddress* address,
+        NIdentifier* recordLayout,
+        double scale,
+        NIdentifier* type,
+        double min,
+        double max,
+        NFormat* format,
+        int number) :
         NCharacteristic(id, description, address, recordLayout, scale, type, min, max, format),
-        number(number) { }
+        m_number(number)
+    { }
 
     void accept(Visitor& v) { v.visit(this); }
 };
 
 class NCharacteristicText : public NCharacteristic { // declaration
 public:
-    int size;
+    int m_size;
 
-    NCharacteristicText(NIdentifier* id,
-                        const std::string& description,
-                        const NAddress& address,
-                        const NIdentifier& recordLayout,
-                        double scale,
-                        const NIdentifier& type,
-                        double min,
-                        double max,
-                        const NFormat& format,
-                        int size) :
+    NCharacteristicText(
+        NIdentifier* id,
+        const std::string& description,
+        NAddress* address,
+        NIdentifier* recordLayout,
+        double scale,
+        NIdentifier* type,
+        double min,
+        double max,
+        NFormat* format,
+        int size) :
         NCharacteristic(id, description, address, recordLayout, scale, type, min, max, format),
-        size(size) { }
+        m_size(size)
+    { }
 
     void accept(Visitor& v) { v.visit(this); }
 };

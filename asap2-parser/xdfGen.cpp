@@ -247,7 +247,7 @@ void XdfGen::visit(/*NMap*/NBaseMap* elem)
     short typeSize;
     bool typeSign;
 //    std::cout << "RECORD " << elem->m_recordLayout.name << std::endl;
-    const NRecordLayout* recordLayout = m_module.recordLayouts.at(elem->m_recordLayout.name);
+    const NRecordLayout* recordLayout = m_module.recordLayouts.at(elem->m_recordLayout->name);
 
     if (!recordLayout->hasFncValues()) {
         std::cerr << "NRecordLayout for map: " << elem->id->name
@@ -266,8 +266,8 @@ void XdfGen::handleComMap(const NMap<NComAxis>* comMap)
 
     createCatRefsForMap(*comMap->id);
     try {
-        handleAxis(comMap->axis_1, /*Extern,*/ comMap->address.value, "x");
-        handleAxis(comMap->axis_2, /*Extern,*/ comMap->address.value, "y");
+        handleAxis(*comMap->m_axis_1.get(), comMap->m_address->value, "x");
+        handleAxis(*comMap->m_axis_2.get(), comMap->m_address->value, "y");
     }
     catch (std::out_of_range& e) {
 //    catch (std::exception& e) {
@@ -282,10 +282,10 @@ unsigned int XdfGen::handleStdMap(const NMap<NStdAxis>* stdMap)
 
     createCatRefsForMap(*stdMap->id);
     try {
-        axisAddr = stdMap->address.value + offset;
-        offset += handleAxis(stdMap->axis_1, /*Intern,*/ axisAddr, "x");
-        axisAddr = stdMap->address.value + offset; // adjust with new offset
-        offset += handleAxis(stdMap->axis_2, /*Intern,*/ axisAddr, "y");
+        axisAddr = stdMap->m_address->value + offset;
+        offset += handleAxis(*stdMap->m_axis_1.get(), axisAddr, "x");
+        axisAddr = stdMap->m_address->value + offset; // adjust with new offset
+        offset += handleAxis(*stdMap->m_axis_2.get(), axisAddr, "y");
     }
     catch (std::out_of_range& e) {
 //    catch (std::exception& e) {

@@ -47,20 +47,21 @@ AxisStyle NMap<NFixAxis>::axisStyle()
     return Fixed;
 }
 
-NBaseMap* createMap(NIdentifier* id,
-                    const std::string& description,
-                    const NAddress& address,
-                    const NIdentifier& recordLayout,
-                    double scale,
-                    const NIdentifier& type,
-                    double min,
-                    double max,
-                    const NFormat& format,
-                    const NAxis& axis_1,
-                    const NAxis& axis_2)
+NBaseMap* createMap(
+    NIdentifier* id,
+    const std::string& description,
+    NAddress* address,
+    NIdentifier* recordLayout,
+    double scale,
+    NIdentifier* type,
+    double min,
+    double max,
+    NFormat* format,
+    NAxis* axis_1,
+    NAxis* axis_2)
 {
-    AxisStyle style1 = axis_1.getAxisStyle();
-    AxisStyle style2 = axis_1.getAxisStyle();
+    AxisStyle style1 = axis_1->getAxisStyle();
+    AxisStyle style2 = axis_1->getAxisStyle();
 
     if (style1 != style2) {
         std::cerr << "createMap got different axes in one map!" << std::endl;
@@ -78,8 +79,8 @@ NBaseMap* createMap(NIdentifier* id,
                                  min,
                                  max,
                                  format,
-                                 dynamic_cast<const NComAxis&>(axis_1), // this cast is always save
-                                 dynamic_cast<const NComAxis&>(axis_2));
+                                 dynamic_cast<NComAxis*>(axis_1), // this cast is always save
+                                 dynamic_cast<NComAxis*>(axis_2));
     }
     else if (style1 == Intern) {
         map = new NMap<NStdAxis>(id,
@@ -91,8 +92,8 @@ NBaseMap* createMap(NIdentifier* id,
                                  min,
                                  max,
                                  format,
-                                 dynamic_cast<const NStdAxis&>(axis_1), // this cast is always save
-                                 dynamic_cast<const NStdAxis&>(axis_2));
+                                 dynamic_cast<NStdAxis*>(axis_1), // this cast is always save
+                                 dynamic_cast<NStdAxis*>(axis_2));
     }
     else if (style1 == Fixed) {
         map = new NMap<NFixAxis>(id,
@@ -104,8 +105,8 @@ NBaseMap* createMap(NIdentifier* id,
                                  min,
                                  max,
                                  format,
-                                 dynamic_cast<const NFixAxis&>(axis_1), // this cast is always save
-                                 dynamic_cast<const NFixAxis&>(axis_2));
+                                 dynamic_cast<NFixAxis*>(axis_1), // this cast is always save
+                                 dynamic_cast<NFixAxis*>(axis_2));
     }
     return map;
 }
