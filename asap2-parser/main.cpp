@@ -38,7 +38,8 @@ int main(int argc, char* argv[])
         }
         // delete our remaining nodes
         BOOST_FOREACH (ext::stack<Node*>::value_type i, nodes) {
-            delete i;
+            if (!i->hasParent())
+                delete i;
         }
 
         if (result) {

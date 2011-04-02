@@ -166,7 +166,7 @@ unsigned int XdfGen::handleAxis(const NAxis& axis, // TODO add col or row
         assert (comAxis != NULL);
         std::cout << "handle com axis" << std::endl;
         offset = 0; // a com-axis does not affect our map address
-        const NAxisPts* axisPts = m_module.axisPts.at(comAxis->axis_pts.name);
+        const NAxisPts* axisPts = m_module.axisPts.at(comAxis->m_axis_pts->name);
         startAddr = axisPts->address.value;
 
     }

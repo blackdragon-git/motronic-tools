@@ -19,8 +19,11 @@
 #include <boost/assert.hpp>
 #include <boost/checked_delete.hpp>
 
+template<class T, class P, bool optional = false>
+class owner_ptr;
+
 template<class T, class P>
-class owner_ptr
+class owner_ptr<T, P, false>
 {
 private:
     T * m_p;
@@ -32,7 +35,7 @@ private:
 public:
     typedef T element_type;
 
-    explicit owner_ptr(T * p, const P * parent) : m_p(p)
+    owner_ptr(T * p, const P * parent) : m_p(p)
     {
         BOOST_ASSERT( m_p != 0 ); // the pointer is guaranteed to be valid
         p->setParent(parent);
@@ -53,8 +56,71 @@ public:
         return m_p;
     }
 
+    bool hasValue() const
+    {
+        return true;
+    }
+
     T * get() const // never throws
     {
         return m_p;
+    }
+
+    T & ref() const // never throws
+    {
+        return *m_p;
+    }
+};
+
+template<class T, class P>
+class owner_ptr<T, P, true>
+{
+private:
+    T * m_p;
+
+    // noncopyable
+    owner_ptr(const owner_ptr &);
+    owner_ptr & operator=(const owner_ptr &);
+
+public:
+    typedef T element_type;
+
+    owner_ptr(T * p, const P * parent) : m_p(p)
+    {
+        if (p != 0)
+            p->setParent(parent);
+    }
+
+    ~owner_ptr()
+    {
+        boost::checked_delete(m_p);
+    }
+
+    T & operator*() const // never throws
+    {
+        BOOST_ASSERT( m_p != 0 );
+        return *m_p;
+    }
+
+    T * operator->() const // never throws
+    {
+        BOOST_ASSERT( m_p != 0 );
+        return m_p;
+    }
+
+    bool hasValue() const
+    {
+        return ( m_p != 0 );
+    }
+
+    T * get() const // never throws
+    {
+        return m_p;
+    }
+
+    T & ref() const // never throws
+    {
+        BOOST_ASSERT( m_p != 0 );
+        return *m_p;
     }
 };

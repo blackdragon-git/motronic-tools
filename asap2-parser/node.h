@@ -248,7 +248,7 @@ protected:
 
 class NComAxis : public NAxis { // declaration
 public:
-    const NIdentifier& axis_pts;
+    owner_ptr<NIdentifier, Node> m_axis_pts;
 
     NComAxis(
         NIdentifier* dataType,
@@ -256,15 +256,15 @@ public:
         int length,
         double min,
         double max,
-        const NIdentifier& axis_pts) :
+        NIdentifier* axis_pts) :
         NAxis(dataType, compuMethod, length, min, max),
-        axis_pts(axis_pts)
+        m_axis_pts(axis_pts, this)
     { m_axisStyle = Extern; }
 };
 
 class NStdAxis : public NAxis { // declaration
 public:
-    const NFormat& format;
+    owner_ptr<NFormat, Node> m_format;
     /* NDeposite */
 
     NStdAxis(
@@ -273,15 +273,15 @@ public:
         int length,
         double min,
         double max,
-        const NFormat& format) :
+        NFormat* format) :
         NAxis(dataType, compuMethod, length, min, max),
-        format(format)
+        m_format(format, this)
     { m_axisStyle = Intern; }
 };
 
 class NFixAxis : public NAxis { // declaration
 public:
-    const NFormat& format;
+    owner_ptr<NFormat, Node> m_format;
     /* FIX_AXIS_PAR */
 
     NFixAxis(
@@ -290,9 +290,9 @@ public:
         int length,
         double min,
         double max,
-        const NFormat& format) :
+        NFormat* format) :
         NAxis(dataType, compuMethod, length, min, max),
-        format(format)
+        m_format(format, this)
     { m_axisStyle = Fixed; }
 };
 //////////////////
@@ -306,8 +306,7 @@ public:
     owner_ptr<NIdentifier, Node> m_type;
     double min;
     double max;
-    owner_ptr<NFormat, Node> m_format; // TODO: NCharacteristicText needs only sometimes a format tag; will result in:
-    // parser: owner_ptr.hpp:37: owner_ptr<T, P>::owner_ptr(T*, const P*) [with T = NFormat, P = Node]: Assertion `m_p != 0' failed.
+    owner_ptr<NFormat, Node, /* optional */ true> m_format;
 
     NCharacteristic(
         NIdentifier* id,
