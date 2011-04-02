@@ -473,25 +473,26 @@ public:
 class NMeasurement : public NStatement { // declaration
 public:
     std::string description;
-    //	const NIdentifier& dataType;
     int dataType;
     int int1, int2; // these are always 0 and 100; i don't know for what they are
-    const NNumeric& min;
-    const NNumeric& max;
-    const NFormat& format;
-    const NAddress& address;
+    owner_ptr<NNumeric, Node> m_min;
+    owner_ptr<NNumeric, Node> m_max;
+    owner_ptr<NFormat, Node> m_format;
+    owner_ptr<NAddress, Node> m_address;
 
-    NMeasurement(NIdentifier* id,
-                 const std::string& description,
-                 int dataType, //const NIdentifier& dataType,
-                 int int1, int int2,
-                 const NNumeric& min,
-                 const NNumeric& max,
-                 const NFormat& format,
-                 /*	const std::string&*/ const NAddress& address) :
+    NMeasurement(
+        NIdentifier* id,
+        const std::string& description,
+        int dataType,
+        int int1, int int2,
+        NNumeric* min,
+        NNumeric* max,
+        NFormat* format,
+        NAddress* address) :
         NStatement(id), description(description), dataType(dataType),
-        int1(int1), int2(int2), min(min), max(max), format(format),
-        address(address) { }
+        int1(int1), int2(int2), m_min(min, this), m_max(max, this),
+        m_format(format, this), m_address(address, this)
+    { }
 
     void accept(Visitor& v) { v.visit(this); }
 };
@@ -500,58 +501,58 @@ class NMeasurementBit : public NMeasurement { // declaration
 public:
     std::string bitMask; // TODO: change type
 
-    NMeasurementBit(NIdentifier* id,
-                    const std::string& description,
-                    int dataType, //const NIdentifier& dataType,
-                    int int1, int int2,
-                    const NNumeric& min,
-                    const NNumeric& max,
-                    const NFormat& format,
-                    /*	const std::string&*/ const NAddress& address,
-                    const std::string& bitMask) :
+    NMeasurementBit(
+        NIdentifier* id,
+        const std::string& description,
+        int dataType,
+        int int1, int int2,
+        NNumeric* min,
+        NNumeric* max,
+        NFormat* format,
+        NAddress* address,
+        const std::string& bitMask) :
         NMeasurement(id, description, dataType, int1, int2, min, max,format, address),
-        bitMask(bitMask) { }
-
-    //void accept(Visitor& v) { v.visit(this); }
+        bitMask(bitMask)
+    { }
 };
 
 class NMeasurementValue : public NMeasurement { // declaration
 public:
-    const NIdentifier& type; // samples: dez, t10msxs_ub_b2p55
+    owner_ptr<NIdentifier, Node> m_type; // samples: dez, t10msxs_ub_b2p55
     // TODO: bitmask
-    NMeasurementValue( NIdentifier* id,
-                      const std::string& description,
-                      int dataType, //const NIdentifier& dataType,
-                      int int1, int int2,
-                      const NNumeric& min,
-                      const NNumeric& max,
-                      const NFormat& format,
-                      /*	const std::string&*/ const NAddress& address,
-                      const NIdentifier& type) :
+    NMeasurementValue(
+        NIdentifier* id,
+        const std::string& description,
+        int dataType,
+        int int1, int int2,
+        NNumeric* min,
+        NNumeric* max,
+        NFormat* format,
+        NAddress* address,
+        NIdentifier* type) :
         NMeasurement(id, description, dataType, int1, int2, min, max,format, address),
-        type(type) { }
-
-    //void accept(Visitor& v) { v.visit(this); }
+        m_type(type, this)
+    { }
 };
 
 class NMeasurementArray : public NMeasurementValue { // declaration
 public:
     int arraySize;
 
-    NMeasurementArray(NIdentifier* id,
-                      const std::string& description,
-                      int dataType, //const NIdentifier& dataType,
-                      int int1, int int2,
-                      const NNumeric& min,
-                      const NNumeric& max,
-                      const NFormat& format,
-                      /*	const std::string&*/ const NAddress& address,
-                      const NIdentifier& type,
-                      int arraySize) :
+    NMeasurementArray(
+        NIdentifier* id,
+        const std::string& description,
+        int dataType,
+        int int1, int int2,
+        NNumeric* min,
+        NNumeric* max,
+        NFormat* format,
+        NAddress* address,
+        NIdentifier* type,
+        int arraySize) :
         NMeasurementValue(id, description, dataType, int1, int2, min, max, format, address, type),
-        arraySize(arraySize) { }
-
-    //void accept(Visitor& v) { v.visit(this); }
+        arraySize(arraySize)
+    { }
 };
 ////////////////
 

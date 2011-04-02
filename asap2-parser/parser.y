@@ -415,10 +415,10 @@ measurement :	TLBRACE TMEASUREMENT
 						$5,	// dataType
 						atoi($7->c_str()), // int1
 						atoi($8->c_str()), // int2
-						*$9,	// min
-						*$10,	// max
-						*$12,	// format
-						*$14,	// address
+						$9,	// min
+						$10,	// max
+						$12,	// format
+						$14,	// address
 						*$11);	// bitMask
 		}
 	| // without bitmask
@@ -442,11 +442,11 @@ measurement :	TLBRACE TMEASUREMENT
 						$5,	// dataType
 						atoi($7->c_str()), // int1
 						atoi($8->c_str()), // int2
-						*$9,	// min
-						*$10,	// max
-						*$11,	// format
-						*$13,	// address
-						*$6);	// type
+						$9,	// min
+						$10,	// max
+						$11,	// format
+						$13,	// address
+						$6);	// type
 		}
 	| // with bitmask
 		TLBRACE TMEASUREMENT
@@ -470,11 +470,11 @@ measurement :	TLBRACE TMEASUREMENT
 						$5,	// dataType
 						atoi($7->c_str()), // int1
 						atoi($8->c_str()), // int2
-						*$9,	// min
-						*$10,	// max
-						*$12,	// format
-						*$14,	// address
-						*$6);	// type
+						$9,	// min
+						$10,	// max
+						$12,	// format
+						$14,	// address
+						$6);	// type
 		}
 	|
 		TLBRACE TMEASUREMENT
@@ -498,11 +498,11 @@ measurement :	TLBRACE TMEASUREMENT
 						$5,	// dataType
 						atoi($7->c_str()), // int1
 						atoi($8->c_str()), // int2
-						*$9,	// min
-						*$10,	// max
-						*$11,	// format
-						*$15,	// address
-						*$6,	// type
+						$9,	// min
+						$10,	// max
+						$11,	// format
+						$15,	// address
+						$6,	// type
 						atoi($13->c_str())); // arraySize
 		}
 	; // measurement
