@@ -18,21 +18,13 @@
 
 #include <string>
 #include <stdexcept>
-/*
-inline std::string getContent(const std::string& base)
-{
-	if (base.size() < 3)
-		throw std::out_of_range ("const std::string& base");
 
-	return base.substr(1, base.size()-1);
-}
-*/
 inline std::string getAddressSubstr(const std::string& base)
 {
-        if (base.size() < 3) //5)
-		throw std::out_of_range ("const std::string& base");
+    if (base.size() < 3)
+        throw std::out_of_range ("const std::string& base");
 
-        return base.substr(/*3*/2);//, base.size()-1);
+    return base.substr(2);
 }
 
 void getDataTypeInfo(int type, short* sizeInBits, bool* isSigned);

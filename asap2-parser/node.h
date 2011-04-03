@@ -336,6 +336,8 @@ public:
 
 public:
     virtual AxisStyle axisStyle() = 0;
+    virtual int axisXlength() = 0;
+    virtual int axisYlength() = 0;
 };
 
 NBaseMap* createMap(
@@ -376,6 +378,8 @@ public:
     { }
 
     virtual AxisStyle axisStyle();
+    virtual int axisXlength() { return m_axis_1->length; }
+    virtual int axisYlength() { return m_axis_2->length; }
 };
 
 class NCurve : public NCharacteristic { // declaration
@@ -765,17 +769,17 @@ public:
         m_innerBlock(innerBlock, this)
     { buildMaps(); }
 
-    void visit(NBaseMap* elem)      { characteristics[elem->id->name] = elem; }
-    void visit(NCurve* elem)                 { characteristics[elem->id->name] = elem; }
-    void visit(NValue* elem)                 { characteristics[elem->id->name] = elem; }
-    void visit(NValBlk* elem)                { characteristics[elem->id->name] = elem; }
-    void visit(NCharacteristicText* elem)    { characteristics[elem->id->name] = elem; }
+    void visit(NBaseMap* elem)              { characteristics[elem->id->name] = elem; }
+    void visit(NCurve* elem)                { characteristics[elem->id->name] = elem; }
+    void visit(NValue* elem)                { characteristics[elem->id->name] = elem; }
+    void visit(NValBlk* elem)               { characteristics[elem->id->name] = elem; }
+    void visit(NCharacteristicText* elem)   { characteristics[elem->id->name] = elem; }
 
-    void visit(NAxisPts* elem)               { axisPts[elem->id->name] = elem; }
-    void visit(NMeasurement* elem)           { measurements[elem->id->name] = elem; }
-    void visit(NFunction* elem)              { functions[elem->id->name] = elem; }
-    void visit(NCompuMethod* elem)           { compuMethods[elem->id->name] = elem; }
-    void visit(NRecordLayout* elem)          { recordLayouts[elem->id->name] = elem; }
+    void visit(NAxisPts* elem)              { axisPts[elem->id->name] = elem; }
+    void visit(NMeasurement* elem)          { measurements[elem->id->name] = elem; }
+    void visit(NFunction* elem)             { functions[elem->id->name] = elem; }
+    void visit(NCompuMethod* elem)          { compuMethods[elem->id->name] = elem; }
+    void visit(NRecordLayout* elem)         { recordLayouts[elem->id->name] = elem; }
 
     // inner statements
     void visit(NConstant* elem) { std::cerr << "NConstant is invalid in this context!\n" << std::endl; }

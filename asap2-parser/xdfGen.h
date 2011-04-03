@@ -61,7 +61,11 @@ private:
                                   const ExpressionList& refs);
     void createCatRefsForMap(const NIdentifier& id);
     void createHeader();
-    void createFinalAxis(const char* name); // TODO
+//    void createFinalAxis(const char* name); // TODO
+    void createMathEquation(
+        short typeSize,
+        bool typeSign,
+        double max, double min);
 
     unsigned int handleAxis(const NAxis& axis,
 //                            AxisStyle axisStyle,

@@ -21,17 +21,6 @@
 
 #include "xdfGen.h"
 #include "util.h"
-/*
-void Node::xdfGen() const
-{
-//	cout << "Node" << endl;
-}
-
-void NMap::xdfGen() const
-{
-	std::cout << "Generate xdf for " << id.name << std::endl;
-}
-*/
 
 XdfGen::XdfGen(const NModule& module) :
     m_done(false), m_module(module), m_xdf(std::stringstream::out)
@@ -104,7 +93,7 @@ void XdfGen::createHeader()
 
     m_xdf << "</XDFHEADER>" << "\n";
 }
-
+/*
 void XdfGen::createFinalAxis(const char* name)
 {
     m_xdf << "<XDFAXIS id=\"" << name << "\">" << "\n"
@@ -114,16 +103,17 @@ void XdfGen::createFinalAxis(const char* name)
 <MATH equation="0.750000 * X+ -48.000000">
   <VAR id="X" />
 </MATH>*/
-// TODO inline
-void createMathEquation(//const NAxis& axis,
-                                short typeSize,
-                                bool typeSign,
-                 double max, double min,
-                                double& factor, /* out */
-                                double& offset /* out */)
+
+void XdfGen::createMathEquation(
+    short typeSize,
+    bool typeSign,
+    double max, double min)
+//    double& factor, /* out */
+//    double& offset /* out */)
 {
 //    short typeSize;
 //    bool typeSign;
+    float factor, offset, district;
     int typeMax;
     if (typeSign) {
         typeMax = (1 << (typeSize - 1)) - 1;
@@ -131,10 +121,18 @@ void createMathEquation(//const NAxis& axis,
     else {
         typeMax = (1 << typeSize) - 1;
     }
-    double district = std::abs(max - min);
+
+    district = std::abs(max - min);
     factor = district / typeMax;
     offset = min;
-    //     std::stringstream
+
+    m_xdf << "<MATH equation=\"" << factor << " * X";
+
+    if (offset != 0) m_xdf << "+ " << offset;
+
+    m_xdf << "\">\n"
+          << "<VAR id=\"X\" />\n"
+          << "</MATH>\n";
 }
 
 void XdfGen::epilogue()
@@ -205,23 +203,16 @@ unsigned int XdfGen::handleAxis(const NAxis& axis, // TODO add col or row
           << "<unittype>0</unittype>\n"
           << "<DALINK index=\"0\" />\n";
 
-    double factor, d_offset;
-    createMathEquation(typeSize, typeSign, axis.max, axis.min, factor, d_offset);
+//    double factor, d_offset;
+    createMathEquation(typeSize, typeSign, axis.max, axis.min);//, factor, d_offset);
 
-    m_xdf << "<MATH equation=\"" << factor << " * X";
-
-    if (d_offset != 0) m_xdf << "+ " << d_offset;
-
-    m_xdf << "\">\n"
-          << "<VAR id=\"X\" />\n"
-          << "</MATH>\n"
-          << "</XDFAXIS>" << "\n";
+    m_xdf << "</XDFAXIS>" << "\n";
 
     return offset;
 }
 
 // all top-level statements
-void XdfGen::visit(/*NMap*/NBaseMap* elem)
+void XdfGen::visit(NBaseMap* elem)
 {
     std::cout << "visiting NMap " << elem->id->name << std::endl;
 
@@ -229,7 +220,7 @@ void XdfGen::visit(/*NMap*/NBaseMap* elem)
           << "<title>" << elem->id->name << "</title>" << "\n"
           << "<description>" << elem->description << "</description>" << "\n"; // TODO: umlaute!
 
-    unsigned int offset = 0;
+    unsigned int offset = 0, startAddr;
     if (elem->axisStyle() == Intern) {
         std::cout << "with std-axis\n";
         const NMap<NStdAxis>* stdMap = dynamic_cast<const NMap<NStdAxis>*>(elem);
@@ -243,6 +234,10 @@ void XdfGen::visit(/*NMap*/NBaseMap* elem)
     else if (elem->axisStyle() == Fixed) {
         std::cout << "with fix-axis\n";
     }
+
+    // final data address
+    startAddr = elem->m_address->value + offset;
+
 // RECORD_LAYOUT ?
     short typeSize;
     bool typeSign;
@@ -256,8 +251,25 @@ void XdfGen::visit(/*NMap*/NBaseMap* elem)
     }
     getDataTypeInfo(recordLayout->getFncValues().type, &typeSize, &typeSign);
 
-    createFinalAxis("z");
-    m_xdf << "</XDFTABLE>" << "\n";
+//    createFinalAxis("z");
+    // create final Axis
+    m_xdf << "<XDFAXIS id=\"z\">" << "\n"
+          << "<EMBEDDEDDATA mmedtypeflags=\"0x02\" "
+          << "mmedaddress=\"0x" << std::hex << startAddr << std::dec << "\" "
+          << "mmedelementsizebits=\"" << typeSize << "\" "
+          << "mmedrowcount=\"" << elem->axisXlength() << "\" "
+          << "mmedcolcount=\"" << elem->axisYlength() << "\" "
+          << "/>\n"
+          << "<units>-</units>\n" // TODO
+          << "<decimalpl>" << elem->m_format->getDecimalPl() << "</decimalpl>\n"
+          << "<min>" << elem->min << "</min>\n"
+          << "<max>" << elem->max << "</max>\n"
+          << "<outputtype>1</outputtype>\n"; // TODO was macht das?
+
+    createMathEquation(typeSize, typeSign, elem->max, elem->min);
+
+    m_xdf << "</XDFAXIS>" << "\n"
+          << "</XDFTABLE>" << "\n";
 }
 
 void XdfGen::handleComMap(const NMap<NComAxis>* comMap)
@@ -278,6 +290,8 @@ void XdfGen::handleComMap(const NMap<NComAxis>* comMap)
 unsigned int XdfGen::handleStdMap(const NMap<NStdAxis>* stdMap)
 {
     assert(stdMap != NULL);
+
+    // FIXME: it is not guranted to be a byte; NRecordLayout gives the answer
     unsigned int offset = 2, axisAddr; // the first two bytes to describe the axis length
 
     createCatRefsForMap(*stdMap->id);
