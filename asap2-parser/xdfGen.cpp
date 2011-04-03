@@ -82,8 +82,8 @@ void XdfGen::createCatRefsForMap(const NIdentifier& id)
     const FunctionHashMap& functions = m_module.functions;
     BOOST_FOREACH (FunctionHashMap::value_type i, functions) {
 
-        createCategoryReferences(id, *i.second->id, i.second->def_characteristic);
-        createCategoryReferences(id, *i.second->id, i.second->ref_characteristic);
+        createCategoryReferences(id, * i.second->id, * i.second->def_characteristic);
+        createCategoryReferences(id, * i.second->id, * i.second->ref_characteristic);
     }
 }
 
@@ -167,7 +167,7 @@ unsigned int XdfGen::handleAxis(const NAxis& axis, // TODO add col or row
         std::cout << "handle com axis" << std::endl;
         offset = 0; // a com-axis does not affect our map address
         const NAxisPts* axisPts = m_module.axisPts.at(comAxis->m_axis_pts->name);
-        startAddr = axisPts->address.value;
+        startAddr = axisPts->m_address->value;
 
     }
     else if (axisStyle == Intern) {
@@ -199,7 +199,7 @@ unsigned int XdfGen::handleAxis(const NAxis& axis, // TODO add col or row
           << "/>\n"
           << "<units>" << compuMethod->unit << "</units>\n"
           << "<indexcount>" << axis.length << "</indexcount>\n"
-          << "<decimalpl>" << compuMethod->format.getDecimalPl() << "</decimalpl>\n"
+          << "<decimalpl>" << compuMethod->m_format->getDecimalPl() << "</decimalpl>\n"
           << "<embedinfo type=\"1\" />\n"
           << "<datatype>0</datatype>\n"
           << "<unittype>0</unittype>\n"

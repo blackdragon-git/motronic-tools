@@ -108,7 +108,7 @@ project :	TASAP2_VERSION numeric numeric
 			header
 			module
 		TRBRACE TPROJECT
-		{ projectBlock = new NProject(*$8, *$9); YYACCEPT; }
+		{ projectBlock = new NProject($8, $9); YYACCEPT; }
 	;
 
 header :	TLBRACE THEADER TSTRING
@@ -116,7 +116,7 @@ header :	TLBRACE THEADER TSTRING
 			TPROJECT_NO ident
 		TRBRACE THEADER
 		{
-			$$ = new NHeader(*$3, *$5, *$7);
+			$$ = new NHeader(*$3, *$5, $7);
 		}
 	;
 
@@ -126,7 +126,7 @@ module :	TLBRACE TMODULE ident string
 			stmts
 		TRBRACE TMODULE
 		{
-			$$ = new NModule(*$7);
+			$$ = new NModule($7);
 		}
 	;
 
@@ -577,15 +577,15 @@ axis_pts :	TLBRACE TAXIS_PTS
 			printf("\taxis-pts: %s %s\n", $3->name.c_str(), $4->c_str());
 			$$ = new NAxisPts($3,	// name
 					*$4,	// description
-					*$5,	// address
-					*$6,	// unit
-					*$7,	// ident
+					$5,	// address
+					$6,	// unit
+					$7,	// ident
 					atof($8->c_str()),	// scale
-					*$9,	//type
+					$9,	//type
 					atoi($10->c_str()),	// size
 					atof($11->c_str()),	// min
 					atof($12->c_str()),	// max
-					*$13);	// format
+					$13);	// format
 		}
 	; // axis_pts
 
@@ -658,14 +658,14 @@ compu_method :	TLBRACE TCOMPU_METHOD
 			NFormat* format = new NFormat(*$6);
 			$$ = new NCompuMethod($3,	// name
 						*$4,	// description
-						*format, // format
+						format, // format
 						*$7,	// unit
-						*$9,	// number1
-						*$10,	// number2
-						*$11,	// number3
-						*$12,	// number4
-						*$13,	// number5
-						*$14);	// number6
+						$9,	// number1
+						$10,	// number2
+						$11,	// number3
+						$12,	// number4
+						$13,	// number5
+						$14);	// number6
 		}
 	| // boolean
 		TLBRACE TCOMPU_METHOD
@@ -765,7 +765,7 @@ function :	TLBRACE TFUNCTION
 		TRBRACE TFUNCTION
 		{
 			printf("\tfunction: %s %s\n", $3->name.c_str(), $4->c_str());
-			$$ = new NFunction($3, *$4, *$5, *$6, *$7, *$8, *$9, *$10);
+			$$ = new NFunction($3, *$4, $5, $6, $7, $8, $9, $10);
 		}
 	; // function
 

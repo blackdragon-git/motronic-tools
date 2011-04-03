@@ -36,3 +36,14 @@ inline std::string getAddressSubstr(const std::string& base)
 }
 
 void getDataTypeInfo(int type, short* sizeInBits, bool* isSigned);
+
+template<class T>
+void deleteAndClear(T& container)
+{
+    for (typename T::iterator it = container.begin();
+         it != container.end(); ++it ) {
+        delete *it;
+    }
+
+    container.clear();
+}

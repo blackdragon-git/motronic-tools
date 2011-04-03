@@ -32,52 +32,41 @@ extern ext::stack<Node*> nodes;
 
 int main(int argc, char* argv[])
 {
-        int result = yyparse();
-        BOOST_FOREACH (std::vector<std::string*>::value_type i, value_tokens) {
+    int result = yyparse();
+    BOOST_FOREACH (std::vector<std::string*>::value_type i, value_tokens) {
+        delete i;
+    }
+
+    // delete our remaining nodes
+    BOOST_FOREACH (ext::stack<Node*>::value_type i, nodes) {
+        if (!i->hasParent())
             delete i;
-        }
-        // delete our remaining nodes
-        BOOST_FOREACH (ext::stack<Node*>::value_type i, nodes) {
-            if (!i->hasParent())
-                delete i;
-        }
+    }
 
-        if (result) {
-            std::cerr << "Failed to parse input stream!" << std::endl;
-            return result;
-        }
+    if (result) {
+        std::cerr << "Failed to parse input stream!" << std::endl;
+        return result;
+    }
 
-	std::cout << projectBlock << endl;
-	if (projectBlock == NULL) {
-		return -1;
-	}
+    std::cout << projectBlock << endl;
+    if (projectBlock == NULL) {
+        return -1;
+    }
 
-//	getchar();
+    //	getchar();
 
-        XdfGen generator(projectBlock->module);
+    XdfGen generator(projectBlock->m_module.ref());
 
-	const CharacteristicHashMap& characteristics = projectBlock->module.characteristics;
-        BOOST_FOREACH (CharacteristicHashMap::value_type i, characteristics) {
-		NStatement* current = i.second;
-/*		if (current == NULL) {
-			cout << "current == NULL !" << endl;
-			continue;
-                }
-*/
-                current->accept(generator);
-	}
-        generator.epilogue();
+    const CharacteristicHashMap& characteristics = projectBlock->m_module->characteristics;
+    BOOST_FOREACH (CharacteristicHashMap::value_type i, characteristics) {
+        NStatement* current = i.second;
+        assert(current != NULL);
+        current->accept(generator);
+    }
+    generator.epilogue();
 
-/*
-	const StatementList& stmts = projectBlock->module.innerBlock.statements;
-	for (StatementList::const_iterator it = stmts.begin(); it != stmts.end(); ++it) {
-		NStatement* current = *it;
-		if (current == NULL) {
-			cout << "current == NULL !" << endl;
-			continue;
-		}
-		current->xdfGen();
-	}
-*/
-	return 0;
+    delete projectBlock; // this will delete our whole tree
+    projectBlock = NULL;
+
+    return 0;
 }

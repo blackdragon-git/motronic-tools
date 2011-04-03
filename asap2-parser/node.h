@@ -35,10 +35,8 @@ enum AxisStyle { Extern, Intern, Fixed };
 class NStatement;
 class NExpression;
 
-//class NVariableDeclaration;
 
 class NCharacteristic;
-
 class NBaseMap;
 
 template<class T>
@@ -60,16 +58,13 @@ class NVariable;
 
 typedef std::vector<NStatement*> StatementList;
 typedef std::vector<NExpression*> ExpressionList;
-//typedef std::vector<NVariableDeclaration*> VariableList;
 
-//typedef hash_map<std::string, NStatement*, hash<std::string>, eqstring> StatementHashMap;
 typedef boost::unordered_map<std::string, NCharacteristic*> CharacteristicHashMap;
 typedef boost::unordered_map<std::string, NAxisPts*> AxisPtsHashMap;
 typedef boost::unordered_map<std::string, NMeasurement*> MeasurementHashMap;
 typedef boost::unordered_map<std::string, NFunction*> FunctionHashMap;
 typedef boost::unordered_map<std::string, NCompuMethod*> CompuMethodHashMap;
 typedef boost::unordered_map<std::string, NRecordLayout*> RecordLayoutHashMap;
-//typedef boost::unordered_map<std::string, NStatement*> StatementHashMap;
 
 class Visitor
 {
@@ -77,8 +72,7 @@ public:
     virtual ~Visitor() { }
 
     // all top-level statements
-    //	virtual void visit(NCharacteristic* elem) = 0;
-    virtual void visit(/*NMap*/ NBaseMap* elem) = 0;
+    virtual void visit(NBaseMap* elem) = 0;
     virtual void visit(NCurve* elem) = 0;
     virtual void visit(NValue* elem) = 0;
     virtual void visit(NValBlk* elem) = 0;
@@ -178,7 +172,6 @@ public:
 class NBlock : public NExpression {
 public:
     StatementList statements;
-    //	StatementHashMap statements;
 
     NBlock() { }
 
@@ -520,6 +513,7 @@ class NMeasurementValue : public NMeasurement { // declaration
 public:
     owner_ptr<NIdentifier, Node> m_type; // samples: dez, t10msxs_ub_b2p55
     // TODO: bitmask
+
     NMeasurementValue(
         NIdentifier* id,
         const std::string& description,
@@ -559,30 +553,33 @@ public:
 class NAxisPts : public NStatement {
 public:
     std::string description;
-    const NAddress& address;
-    const NIdentifier& unit;
-    const NIdentifier& ident;
+    owner_ptr<NAddress, Node> m_address;
+    owner_ptr<NIdentifier, Node> m_unit;
+    owner_ptr<NIdentifier, Node> m_ident;
     double scale;
-    const NIdentifier& type;
+    owner_ptr<NIdentifier, Node> m_type;
     int size;
     double min;
     double max;
-    const NFormat& format;
+    owner_ptr<NFormat, Node> m_format;
 
-    NAxisPts(NIdentifier* id,
-             const std::string& description,
-             /*	const std::string&*/ const NAddress& address,
-             const NIdentifier& units,
-             const NIdentifier& ident,
-             double scale,
-             const NIdentifier& type,
-             int size,
-             double min,
-             double max,
-             const NFormat& format) :
-        NStatement(id), description(description), address(address),
-        unit(unit), ident(ident), scale(scale), type(type), size(size),
-        min(min), max(max), format(format) { }
+    NAxisPts(
+        NIdentifier* id,
+        const std::string& description,
+        NAddress* address,
+        NIdentifier* unit,
+        NIdentifier* ident,
+        double scale,
+        NIdentifier* type,
+        int size,
+        double min,
+        double max,
+        NFormat* format) :
+        NStatement(id), description(description), m_address(address, this),
+        m_unit(unit, this), m_ident(ident, this), scale(scale),
+        m_type(type, this), size(size), min(min), max(max),
+        m_format(format, this)
+    { }
 
     void accept(Visitor& v) { v.visit(this); }
 };
@@ -592,29 +589,31 @@ public:
 class NCompuMethod : public NStatement {
 public:
     std::string description;
-    const NFormat& format;
+    owner_ptr<NFormat, Node> m_format;
     std::string unit;
-    const NNumeric& number1;
-    const NNumeric& number2;
-    const NNumeric& number3;
-    const NNumeric& number4;
-    const NNumeric& number5;
-    const NNumeric& number6;
+    owner_ptr<NNumeric, Node> m_number1;
+    owner_ptr<NNumeric, Node> m_number2;
+    owner_ptr<NNumeric, Node> m_number3;
+    owner_ptr<NNumeric, Node> m_number4;
+    owner_ptr<NNumeric, Node> m_number5;
+    owner_ptr<NNumeric, Node> m_number6;
 
-    NCompuMethod(NIdentifier* id,
-                 const std::string& description,
-                 const NFormat& format,
-                 const std::string& unit,
-                 const NNumeric& number1,
-                 const NNumeric& number2,
-                 const NNumeric& number3,
-                 const NNumeric& number4,
-                 const NNumeric& number5,
-                 const NNumeric& number6) :
-        NStatement(id), description(description), format(format),
-        unit(unit), number1(number1), number2(number2),
-        number3(number3), number4(number4), number5(number5),
-        number6(number6) { }
+    NCompuMethod(
+        NIdentifier* id,
+        const std::string& description,
+        NFormat* format,
+        const std::string& unit,
+        NNumeric* number1,
+        NNumeric* number2,
+        NNumeric* number3,
+        NNumeric* number4,
+        NNumeric* number5,
+        NNumeric* number6) :
+        NStatement(id), description(description), m_format(format, this),
+        unit(unit), m_number1(number1, this), m_number2(number2, this),
+        m_number3(number3, this), m_number4(number4, this),
+        m_number5(number5, this), m_number6(number6, this)
+    { }
 
     void accept(Visitor& v) { v.visit(this); }
 };
@@ -625,25 +624,41 @@ class NFunction : public NStatement {
 public:
     std::string description;
 
-    const ExpressionList& def_characteristic;
-    const ExpressionList& ref_characteristic;
-    const ExpressionList& in_measurement;
-    const ExpressionList& out_measurement;
-    const ExpressionList& loc_measurement;
-    const ExpressionList& sub_function;
+    ExpressionList* def_characteristic;
+    ExpressionList* ref_characteristic;
+    ExpressionList* in_measurement;
+    ExpressionList* out_measurement;
+    ExpressionList* loc_measurement;
+    ExpressionList* sub_function;
 
-    NFunction(NIdentifier* id,
-              const std::string& description,
-              const ExpressionList& def_characteristic,
-              const ExpressionList& ref_characteristic,
-              const ExpressionList& in_measurement,
-              const ExpressionList& out_measurement,
-              const ExpressionList& loc_measurement,
-              const ExpressionList& sub_function) :
-        NStatement(id), description(description), def_characteristic(def_characteristic),
-        ref_characteristic(ref_characteristic), in_measurement(in_measurement),
-        out_measurement(out_measurement), loc_measurement(loc_measurement),
-        sub_function(sub_function) { }
+    NFunction(
+        NIdentifier* id,
+        const std::string& description,
+        ExpressionList* def_characteristic,
+        ExpressionList* ref_characteristic,
+        ExpressionList* in_measurement,
+        ExpressionList* out_measurement,
+        ExpressionList* loc_measurement,
+        ExpressionList* sub_function) :
+        NStatement(id), description(description),
+        def_characteristic(def_characteristic),
+        ref_characteristic(ref_characteristic),
+        in_measurement(in_measurement),
+        out_measurement(out_measurement),
+        loc_measurement(loc_measurement),
+        sub_function(sub_function)
+    { }
+
+    ~NFunction()
+    {
+        // delete our child nodes
+        deleteAndClear(*def_characteristic);
+        deleteAndClear(*ref_characteristic);
+        deleteAndClear(*in_measurement);
+        deleteAndClear(*out_measurement);
+        deleteAndClear(*loc_measurement);
+        deleteAndClear(*sub_function);
+    }
 
     void accept(Visitor& v) { v.visit(this); }
 };
@@ -722,15 +737,19 @@ class NHeader : public NExpression {
 public:
     std::string name;
     std::string model;
-    const NIdentifier& project; // std::auto_ptr für alle referenzen?
+    owner_ptr<NIdentifier, Node> m_project;
 
-    NHeader(const std::string& name, const std::string& model, const NIdentifier& project) :
-        name(name), model(model), project(project) { }
+    NHeader(
+        const std::string& name,
+        const std::string& model,
+        NIdentifier* project) :
+        name(name), model(model), m_project(project, this)
+    { }
 };
 
 class NModule : public Node, public Visitor {
 public:
-    const NBlock& innerBlock;
+    owner_ptr<NBlock, Node> m_innerBlock;
 
     CharacteristicHashMap characteristics;
     AxisPtsHashMap axisPts;
@@ -741,10 +760,12 @@ public:
     //	| compu_tab
     //	| compu_vtab
 
-    NModule(const NBlock& innerBlock) : innerBlock(innerBlock) { buildMaps(); }
+    NModule(
+        NBlock* innerBlock) :
+        m_innerBlock(innerBlock, this)
+    { buildMaps(); }
 
-    //	void visit(NCharacteristic* elem)    { characteristics[elem->id.name] = elem; }
-    void visit(/*NMap*/ NBaseMap* elem)      { characteristics[elem->id->name] = elem; }
+    void visit(NBaseMap* elem)      { characteristics[elem->id->name] = elem; }
     void visit(NCurve* elem)                 { characteristics[elem->id->name] = elem; }
     void visit(NValue* elem)                 { characteristics[elem->id->name] = elem; }
     void visit(NValBlk* elem)                { characteristics[elem->id->name] = elem; }
@@ -763,7 +784,7 @@ public:
 private:
     void buildMaps()
     {
-        BOOST_FOREACH(StatementList::value_type i, innerBlock.statements) {
+        BOOST_FOREACH(StatementList::value_type i, m_innerBlock->statements) {
             if (i != NULL) i->accept(*this);
         }
     }
@@ -771,7 +792,12 @@ private:
 
 class NProject : public Node {
 public:
-    const NHeader& header;
-    const NModule& module;
-    NProject(const NHeader& header, const NModule& module) : header(header), module(module) { }
+    owner_ptr<NHeader, Node> m_header;
+    owner_ptr<NModule, Node> m_module;
+
+    NProject(
+        NHeader* header,
+        NModule* module) :
+        m_header(header, this), m_module(module, this)
+    { }
 };
