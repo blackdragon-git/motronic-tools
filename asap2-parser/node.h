@@ -296,7 +296,7 @@ public:
     owner_ptr<NAddress, Node> m_address;
     owner_ptr<NIdentifier, Node> m_recordLayout;
     double scale;
-    owner_ptr<NIdentifier, Node> m_type;
+    owner_ptr<NIdentifier, Node> m_compuMethod;
     double min;
     double max;
     owner_ptr<NFormat, Node, /* optional */ true> m_format;
@@ -307,13 +307,14 @@ public:
         NAddress* address,
         NIdentifier* recordLayout,
         double scale,
-        NIdentifier* type,
+        NIdentifier* compuMethod,
         double min,
         double max,
         NFormat* format) :
         NStatement(id), description(description), m_address(address, this),
-        m_recordLayout(recordLayout, this), scale(scale), m_type(type, this),
-        min(min), max(max), m_format(format, this)
+        m_recordLayout(recordLayout, this), scale(scale),
+        m_compuMethod(compuMethod, this), min(min), max(max),
+        m_format(format, this)
     { }
 };
 
@@ -325,11 +326,11 @@ public:
         NAddress* address,
         NIdentifier* recordLayout,
         double scale,
-        NIdentifier* type,
+        NIdentifier* compuMethod,
         double min,
         double max,
         NFormat* format) :
-        NCharacteristic(id, description, address, recordLayout, scale, type, min, max, format)
+        NCharacteristic(id, description, address, recordLayout, scale, compuMethod, min, max, format)
     { }
 
     void accept(Visitor& v) { v.visit(this); }
@@ -346,7 +347,7 @@ NBaseMap* createMap(
     NAddress* address,
     NIdentifier* recordLayout,
     double scale,
-    NIdentifier* type,
+    NIdentifier* compuMethod,
     double min,
     double max,
     NFormat* format,
@@ -367,13 +368,13 @@ public:
         NAddress* address,
         NIdentifier* recordLayout,
         double scale,
-        NIdentifier* type,
+        NIdentifier* compuMethod,
         double min,
         double max,
         NFormat* format,
         T * axis_1,
         T * axis_2) :
-        NBaseMap(id, description, address, recordLayout, scale, type, min, max, format),
+        NBaseMap(id, description, address, recordLayout, scale, compuMethod, min, max, format),
         m_axis_1(axis_1, this), m_axis_2(axis_2, this)
     { }
 
@@ -392,12 +393,12 @@ public:
         NAddress* address,
         NIdentifier* recordLayout,
         double scale,
-        NIdentifier* type,
+        NIdentifier* compuMethod,
         double min,
         double max,
         NFormat* format,
         NAxis* axis_1) :
-        NCharacteristic(id, description, address, recordLayout, scale, type, min, max, format),
+        NCharacteristic(id, description, address, recordLayout, scale, compuMethod, min, max, format),
         m_axis_1(axis_1, this)
     { }
 
@@ -412,11 +413,11 @@ public:
         NAddress* address,
         NIdentifier* recordLayout,
         double scale,
-        NIdentifier* type,
+        NIdentifier* compuMethod,
         double min,
         double max,
         NFormat* format) :
-        NCharacteristic(id, description, address, recordLayout, scale, type, min, max, format)
+        NCharacteristic(id, description, address, recordLayout, scale, compuMethod, min, max, format)
     { }
 
     void accept(Visitor& v) { v.visit(this); }
@@ -432,12 +433,12 @@ public:
         NAddress* address,
         NIdentifier* recordLayout,
         double scale,
-        NIdentifier* type,
+        NIdentifier* compuMethod,
         double min,
         double max,
         NFormat* format,
         int number) :
-        NCharacteristic(id, description, address, recordLayout, scale, type, min, max, format),
+        NCharacteristic(id, description, address, recordLayout, scale, compuMethod, min, max, format),
         m_number(number)
     { }
 
@@ -454,12 +455,12 @@ public:
         NAddress* address,
         NIdentifier* recordLayout,
         double scale,
-        NIdentifier* type,
+        NIdentifier* compuMethod,
         double min,
         double max,
         NFormat* format,
         int size) :
-        NCharacteristic(id, description, address, recordLayout, scale, type, min, max, format),
+        NCharacteristic(id, description, address, recordLayout, scale, compuMethod, min, max, format),
         m_size(size)
     { }
 

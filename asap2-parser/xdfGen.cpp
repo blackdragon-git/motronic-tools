@@ -31,7 +31,7 @@ XdfGen::XdfGen(const NModule& module) :
 void XdfGen::createCategorys()
 {
     int n = 0;
-    m_xdf << std::hex; //.setf(std::ios::hex);
+    m_xdf << std::hex;
 
     const FunctionHashMap& functions = m_module.functions;
     BOOST_FOREACH (FunctionHashMap::value_type i, functions) {
@@ -146,7 +146,7 @@ void XdfGen::epilogue()
 }
 
 unsigned int XdfGen::handleAxis(const NAxis& axis, // TODO add col or row
-                                unsigned int baseAddr, //const NAddress& baseAddr,
+                                unsigned int baseAddr,
                                 const char* name)
 {
     const NMeasurement* measurement = m_module.measurements.at(axis.m_dataType->name);
@@ -187,6 +187,9 @@ unsigned int XdfGen::handleAxis(const NAxis& axis, // TODO add col or row
     const NCompuMethod* compuMethod = m_module.compuMethods.at(axis.m_compuMethod->name);
     assert(compuMethod != NULL);
 
+    std::string units = compuMethod->unit;
+    if (units.empty()) units = "-";
+
     //generate:
     m_xdf << "<XDFAXIS id=\"" << name << "\" uniqueid=\"0x0\">" << "\n" // TODO uniqueid
           << "<EMBEDDEDDATA mmedtypeflags=\"0x02\" "
@@ -195,7 +198,7 @@ unsigned int XdfGen::handleAxis(const NAxis& axis, // TODO add col or row
           << "mmedcolcount=\"" << axis.length << "\" "
           << "mmedmajorstridebits=\"" << typeSize << "\" " // should be the same as mmedelementsizebits
           << "/>\n"
-          << "<units>" << compuMethod->unit << "</units>\n"
+          << "<units>" << units << "</units>\n"
           << "<indexcount>" << axis.length << "</indexcount>\n"
           << "<decimalpl>" << compuMethod->m_format->getDecimalPl() << "</decimalpl>\n"
           << "<embedinfo type=\"1\" />\n"
@@ -243,6 +246,7 @@ void XdfGen::visit(NBaseMap* elem)
     bool typeSign;
 //    std::cout << "RECORD " << elem->m_recordLayout.name << std::endl;
     const NRecordLayout* recordLayout = m_module.recordLayouts.at(elem->m_recordLayout->name);
+    assert(recordLayout != NULL);
 
     if (!recordLayout->hasFncValues()) {
         std::cerr << "NRecordLayout for map: " << elem->id->name
@@ -251,7 +255,13 @@ void XdfGen::visit(NBaseMap* elem)
     }
     getDataTypeInfo(recordLayout->getFncValues().type, &typeSize, &typeSign);
 
-//    createFinalAxis("z");
+    // CompuMethod data:
+    const NCompuMethod* compuMethod = m_module.compuMethods.at(elem->m_compuMethod->name);
+    assert(compuMethod != NULL);
+
+    std::string units = compuMethod->unit;
+    if (units.empty()) units = "-";
+
     // create final Axis
     m_xdf << "<XDFAXIS id=\"z\">" << "\n"
           << "<EMBEDDEDDATA mmedtypeflags=\"0x02\" "
@@ -260,7 +270,7 @@ void XdfGen::visit(NBaseMap* elem)
           << "mmedrowcount=\"" << elem->axisXlength() << "\" "
           << "mmedcolcount=\"" << elem->axisYlength() << "\" "
           << "/>\n"
-          << "<units>-</units>\n" // TODO
+          << "<units>" << units << "</units>\n"
           << "<decimalpl>" << elem->m_format->getDecimalPl() << "</decimalpl>\n"
           << "<min>" << elem->min << "</min>\n"
           << "<max>" << elem->max << "</max>\n"
