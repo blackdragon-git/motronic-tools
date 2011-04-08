@@ -33,7 +33,7 @@ public:
     void epilogue();
 
     // all top-level statements
-    void visit(/*NMap*/ NBaseMap* elem);
+    void visit(NBaseMap* elem);
     void visit(NCurve* elem);
     void visit(NValue* elem);
     void visit(NValBlk* elem);
@@ -50,33 +50,38 @@ public:
     void visit(NVariable* elem);
 
 private:
-    struct FinalAxis // TODO
-    {
-
-    };
-
     void createCategorys();
-    void createCategoryReferences(const NIdentifier& id,
-                                  const NIdentifier& func_id,
-                                  const ExpressionList& refs);
+
+    void createCategoryReferences(
+        const NIdentifier& id,
+        const NIdentifier& func_id,
+        const ExpressionList& refs);
+
     void createCatRefsForMap(const NIdentifier& id);
+
     void createHeader();
-//    void createFinalAxis(const char* name); // TODO
+
     void createMathEquation(
         short typeSize,
         bool typeSign,
         double max, double min);
 
-    unsigned int handleAxis(const NAxis& axis,
-//                            AxisStyle axisStyle,
-                            unsigned int baseAddr, //const NAddress& baseAddr,
-                            const char* name);
+    unsigned int handleAxis(
+        const NAxis& axis,
+        unsigned int baseAddr,
+        const char* name);
+
     void handleComMap(const NMap<NComAxis>* comMap);
-    unsigned int handleStdMap(const NMap<NStdAxis>* stdMap);
+
+    unsigned int handleStdMap(
+        const NMap<NStdAxis>* stdMap,
+        const NRecordLayout& recordLayout);
+
     void handleFixMap(const NMap<NFixAxis>* fixMap);
 
     typedef boost::unordered_map<std::string, int> CategorysHashMap;
 
+    // members:
     CategorysHashMap m_categorys;
     bool m_done;
     const NModule& m_module;

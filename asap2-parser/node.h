@@ -707,8 +707,8 @@ public:
     void accept(Visitor& v) { v.visit(this); }
 
     bool hasFncValues() const { return true; } // FIXME
-    bool hasXAxis() const;
-    bool hasYAxis() const;
+    bool hasXAxis() const { return true; } // FIXME
+    bool hasYAxis() const { return true; } // FIXME
 
     const AxisLayout& getXAxis() const;
     const AxisLayout& getYAxis() const;

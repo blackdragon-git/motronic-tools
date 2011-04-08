@@ -161,7 +161,7 @@ unsigned int XdfGen::handleAxis(const NAxis& axis, // TODO add col or row
     AxisStyle axisStyle = axis.getAxisStyle();
     if (axisStyle == Extern) {
         const NComAxis* comAxis = dynamic_cast<const NComAxis*>(&axis);
-        assert (comAxis != NULL);
+        assert(comAxis != NULL);
         std::cout << "handle com axis" << std::endl;
         offset = 0; // a com-axis does not affect our map address
         const NAxisPts* axisPts = m_module.axisPts.at(comAxis->m_axis_pts->name);
@@ -223,11 +223,20 @@ void XdfGen::visit(NBaseMap* elem)
           << "<title>" << elem->id->name << "</title>" << "\n"
           << "<description>" << elem->description << "</description>" << "\n"; // TODO: umlaute!
 
+    const NRecordLayout* recordLayout = m_module.recordLayouts.at(elem->m_recordLayout->name);
+    assert(recordLayout != NULL);
+
+    if (!recordLayout->hasFncValues()) {
+        std::cerr << "NRecordLayout for the map: " << elem->id->name
+                  << " should have an FNC_VALUES entry!" << std::endl;
+        throw std::exception();
+    }
+
     unsigned int offset = 0, startAddr;
     if (elem->axisStyle() == Intern) {
         std::cout << "with std-axis\n";
         const NMap<NStdAxis>* stdMap = dynamic_cast<const NMap<NStdAxis>*>(elem);
-        offset += handleStdMap(stdMap);
+        offset += handleStdMap(stdMap, *recordLayout);
     }
     else if (elem->axisStyle() == Extern) {
         std::cout << "with com-axis\n";
@@ -241,18 +250,8 @@ void XdfGen::visit(NBaseMap* elem)
     // final data address
     startAddr = elem->m_address->value + offset;
 
-// RECORD_LAYOUT ?
     short typeSize;
     bool typeSign;
-//    std::cout << "RECORD " << elem->m_recordLayout.name << std::endl;
-    const NRecordLayout* recordLayout = m_module.recordLayouts.at(elem->m_recordLayout->name);
-    assert(recordLayout != NULL);
-
-    if (!recordLayout->hasFncValues()) {
-        std::cerr << "NRecordLayout for map: " << elem->id->name
-                  << " should have an FNC_VALUES entry!" << std::endl;
-        throw std::exception();
-    }
     getDataTypeInfo(recordLayout->getFncValues().type, &typeSize, &typeSign);
 
     // CompuMethod data:
@@ -297,12 +296,29 @@ void XdfGen::handleComMap(const NMap<NComAxis>* comMap)
     }
 }
 
-unsigned int XdfGen::handleStdMap(const NMap<NStdAxis>* stdMap)
+unsigned int XdfGen::handleStdMap(
+    const NMap<NStdAxis>* stdMap,
+    const NRecordLayout& recordLayout)
 {
     assert(stdMap != NULL);
 
-    // FIXME: it is not guranted to be a byte; NRecordLayout gives the answer
-    unsigned int offset = 2, axisAddr; // the first two bytes to describe the axis length
+    if (!recordLayout.hasXAxis() || !recordLayout.hasYAxis()) {
+        std::cerr << "NRecordLayout for the map: " << stdMap->id->name
+                  << " is missing the axis description!" << std::endl;
+        throw std::exception();
+    }
+
+    int noTypeX = recordLayout.getXAxis().NoAxisType;
+    int noTypeY = recordLayout.getYAxis().NoAxisType;
+
+    short typeSizeX, typeSizeY;
+    bool typeSignX, typeSignY;
+    getDataTypeInfo(noTypeX, &typeSizeX, &typeSignX);
+    getDataTypeInfo(noTypeY, &typeSizeY, &typeSignY);
+
+    // calculate the start address of the axis description
+    unsigned int offset = (typeSizeX + typeSignY) / 8;
+    unsigned int axisAddr;
 
     createCatRefsForMap(*stdMap->id);
     try {
