@@ -27,7 +27,10 @@
 class XdfGen : public Visitor
 {
 public:
-    XdfGen(const NModule& module);
+    XdfGen(
+        const NModule& module,
+        int offset = 0);
+
     virtual ~XdfGen() { }
 
     void epilogue();
@@ -85,5 +88,6 @@ private:
     CategorysHashMap m_categorys;
     bool m_done;
     const NModule& m_module;
+    int m_offset;
     std::stringstream m_xdf;
 };

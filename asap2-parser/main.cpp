@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
 
     //	getchar();
 
-    XdfGen generator(projectBlock->m_module.ref());
+    XdfGen generator(projectBlock->m_module.ref(), -0x800000);
 
     const CharacteristicHashMap& characteristics = projectBlock->m_module->characteristics;
     BOOST_FOREACH (CharacteristicHashMap::value_type i, characteristics) {

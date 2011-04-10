@@ -22,8 +22,13 @@
 #include "xdfGen.h"
 #include "util.h"
 
-XdfGen::XdfGen(const NModule& module) :
-    m_done(false), m_module(module), m_xdf(std::stringstream::out)
+XdfGen::XdfGen(
+    const NModule& module,
+    int offset) :
+    m_done(false),
+    m_module(module),
+    m_offset(offset),
+    m_xdf(std::stringstream::out)
 {
     createHeader();
 }
@@ -93,38 +98,19 @@ void XdfGen::createHeader()
 
     m_xdf << "</XDFHEADER>" << "\n";
 }
-/*
-void XdfGen::createFinalAxis(const char* name)
-{
-    m_xdf << "<XDFAXIS id=\"" << name << "\">" << "\n"
-          << "</XDFAXIS>" << "\n";
-}
-/*
-<MATH equation="0.750000 * X+ -48.000000">
-  <VAR id="X" />
-</MATH>*/
 
 void XdfGen::createMathEquation(
     short typeSize,
     bool typeSign,
     double max, double min)
-//    double& factor, /* out */
-//    double& offset /* out */)
 {
-//    short typeSize;
-//    bool typeSign;
     float factor, offset, district;
     int typeMax;
-    if (typeSign) {
-        typeMax = (1 << (typeSize - 1)) - 1;
-    }
-    else {
-        typeMax = (1 << typeSize) - 1;
-    }
 
+    typeMax = (1 << typeSize) - 1;
     district = std::abs(max - min);
     factor = district / typeMax;
-    offset = min;
+    if (!typeSign) offset = min;
 
     m_xdf << "<MATH equation=\"" << factor << " * X";
 
@@ -145,18 +131,29 @@ void XdfGen::epilogue()
     std::cout << m_xdf.str() << std::endl;
 }
 
-unsigned int XdfGen::handleAxis(const NAxis& axis, // TODO add col or row
-                                unsigned int baseAddr,
-                                const char* name)
+static inline int getTypeFlags(bool msbLast, bool typeSign)
+{
+    int typeFlags = 0;
+    if (msbLast) typeFlags |= 0x2; // little endian
+    if (typeSign) typeFlags |= 0x1;
+
+    return typeFlags;
+}
+
+unsigned int XdfGen::handleAxis(
+    const NAxis& axis,
+    unsigned int baseAddr,
+    const char* name)
 {
     const NMeasurement* measurement = m_module.measurements.at(axis.m_dataType->name);
     assert(measurement != NULL);
 
     short typeSize;
-    bool typeSign;
+    bool typeSign, msbLast = true; // TODO: endianness
     getDataTypeInfo(measurement->dataType, &typeSize, &typeSign);
 
-    unsigned int startAddr, offset;
+    int offset = m_offset;
+    unsigned int startAddr;
 
     AxisStyle axisStyle = axis.getAxisStyle();
     if (axisStyle == Extern) {
@@ -192,8 +189,9 @@ unsigned int XdfGen::handleAxis(const NAxis& axis, // TODO add col or row
 
     //generate:
     m_xdf << "<XDFAXIS id=\"" << name << "\" uniqueid=\"0x0\">" << "\n" // TODO uniqueid
-          << "<EMBEDDEDDATA mmedtypeflags=\"0x02\" "
-          << "mmedaddress=\"0x" << std::hex << startAddr << std::dec << "\" "
+          << "<EMBEDDEDDATA mmedtypeflags=\"0x"
+          << std::hex << getTypeFlags(msbLast, typeSign) << "\" "
+          << "mmedaddress=\"0x" << startAddr << std::dec << "\" "
           << "mmedelementsizebits=\"" << typeSize << "\" "
           << "mmedcolcount=\"" << axis.length << "\" "
           << "mmedmajorstridebits=\"" << typeSize << "\" " // should be the same as mmedelementsizebits
@@ -232,7 +230,8 @@ void XdfGen::visit(NBaseMap* elem)
         throw std::exception();
     }
 
-    unsigned int offset = 0, startAddr;
+    int offset = m_offset;
+    unsigned int startAddr;
     if (elem->axisStyle() == Intern) {
         std::cout << "with std-axis\n";
         const NMap<NStdAxis>* stdMap = dynamic_cast<const NMap<NStdAxis>*>(elem);
@@ -251,7 +250,7 @@ void XdfGen::visit(NBaseMap* elem)
     startAddr = elem->m_address->value + offset;
 
     short typeSize;
-    bool typeSign;
+    bool typeSign, msbLast = true; // TODO: endianness
     getDataTypeInfo(recordLayout->getFncValues().type, &typeSize, &typeSign);
 
     // CompuMethod data:
@@ -263,7 +262,8 @@ void XdfGen::visit(NBaseMap* elem)
 
     // create final Axis
     m_xdf << "<XDFAXIS id=\"z\">" << "\n"
-          << "<EMBEDDEDDATA mmedtypeflags=\"0x02\" "
+          << "<EMBEDDEDDATA mmedtypeflags=\"0x"
+          << std::hex << getTypeFlags(msbLast, typeSign) << "\" "
           << "mmedaddress=\"0x" << std::hex << startAddr << std::dec << "\" "
           << "mmedelementsizebits=\"" << typeSize << "\" "
           << "mmedrowcount=\"" << elem->axisXlength() << "\" "
