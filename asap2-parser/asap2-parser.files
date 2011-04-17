@@ -11,3 +11,4 @@ util.cpp
 stack.hpp
 owner_ptr.hpp
 genericTree.hpp
+XmlStream.hpp

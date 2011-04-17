@@ -23,6 +23,9 @@
 #include <boost/unordered_map.hpp>
 
 #include "node.h"
+#include "XmlStream.hpp"
+
+using namespace xml;
 
 class XdfGen : public Visitor
 {
@@ -89,5 +92,7 @@ private:
     bool m_done;
     const NModule& m_module;
     int m_offset;
-    std::stringstream m_xdf;
+
+    std::stringstream m_baseStream;
+    XmlStream<char> m_xdf;
 };

@@ -28,7 +28,8 @@ XdfGen::XdfGen(
     m_done(false),
     m_module(module),
     m_offset(offset),
-    m_xdf(std::stringstream::out)
+    m_baseStream(std::stringstream::out),
+    m_xdf(m_baseStream)
 {
     createHeader();
 }
@@ -125,7 +126,7 @@ void XdfGen::epilogue()
 {
     if (m_done) return;
 
-    m_xdf << "</XDFFORMAT>" << std::endl;
+    m_xdf << "</XDFFORMAT>\n"; // << std::endl;
     m_done = true;
     // TESTING
     std::cout << m_xdf.str() << std::endl;
