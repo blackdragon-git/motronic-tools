@@ -18,7 +18,7 @@
 
 int NFormat::getDecimalPl() const
 {
-    int pos = format.find('.');
+    unsigned int pos = format.find('.');
     if (pos == format.npos) throw std::invalid_argument("Format string");
 
     ++pos;

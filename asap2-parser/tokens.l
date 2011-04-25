@@ -27,7 +27,6 @@ std::vector<std::string*> value_tokens;
     value_tokens.push_back(yylval.string);
 
 #define SAVE_STRING yylval.string = new std::string(yytext + 1, yyleng - 2);    \
-//std::cout << *yylval.string << std::endl; \
     value_tokens.push_back(yylval.string);
 
 #define TOKEN(t) (yylval.token = t)

@@ -113,13 +113,12 @@ void XdfGen::createMathEquation(
     factor = district / typeMax;
     if (!typeSign) offset = min;
 
-    m_xdf << "<MATH equation=\"" << factor << " * X";
+    m_xdf << xml::startTag("MATH") << xml::attribute("equation") << factor << " * X";
 
     if (offset != 0) m_xdf << "+ " << offset;
 
-    m_xdf << "\">\n"
-          << "<VAR id=\"X\" />\n"
-          << "</MATH>\n";
+    m_xdf << xml::startTag("VAR") << xml::attribute("id") << "X" << xml::endTag
+          << xml::endTag;
 }
 
 void XdfGen::epilogue()
@@ -188,27 +187,29 @@ unsigned int XdfGen::handleAxis(
     std::string units = compuMethod->unit;
     if (units.empty()) units = "-";
 
-    //generate:
-    m_xdf << "<XDFAXIS id=\"" << name << "\" uniqueid=\"0x0\">" << "\n" // TODO uniqueid
-          << "<EMBEDDEDDATA mmedtypeflags=\"0x"
-          << std::hex << getTypeFlags(msbLast, typeSign) << "\" "
-          << "mmedaddress=\"0x" << startAddr << std::dec << "\" "
-          << "mmedelementsizebits=\"" << typeSize << "\" "
-          << "mmedcolcount=\"" << axis.length << "\" "
-          << "mmedmajorstridebits=\"" << typeSize << "\" " // should be the same as mmedelementsizebits
-          << "/>\n"
-          << "<units>" << units << "</units>\n"
-          << "<indexcount>" << axis.length << "</indexcount>\n"
-          << "<decimalpl>" << compuMethod->m_format->getDecimalPl() << "</decimalpl>\n"
-          << "<embedinfo type=\"1\" />\n"
-          << "<datatype>0</datatype>\n"
-          << "<unittype>0</unittype>\n"
-          << "<DALINK index=\"0\" />\n";
+    // generate:
+    m_xdf << xml::startTag("XDFAXIS") << xml::attribute("id") << name
+          << xml::attribute("uniqueid") << "0x0" // TODO uniqueid
+          << xml::startTag("EMBEDDEDDATA") << xml::attribute("mmedtypeflags")
+          << std::hex << "0x" << getTypeFlags(msbLast, typeSign)
+          << xml::attribute("mmedaddress") << "0x" << startAddr << std::dec
+          << xml::attribute("mmedelementsizebits") << typeSize
+          << xml::attribute("mmedcolcount") << axis.length
+          << xml::attribute("mmedmajorstridebits") << typeSize // should be the same as mmedelementsizebits
+          << xml::endTag
+          << xml::startTag("units") << xml::content << units << xml::endTag
+          << xml::startTag("indexcount") << xml::content << axis.length << xml::endTag
+          << xml::startTag("decimalpl") << xml::content
+          << compuMethod->m_format->getDecimalPl() << xml::endTag
+          << xml::startTag("embedinfo") << xml::attribute("type") << 1 << xml::endTag
+          << xml::startTag("datatype") << xml::content << 0 << xml::endTag
+          << xml::startTag("unittype") << xml::content << 0 << xml::endTag
+          << xml::startTag("DALINK") << xml::attribute("index") << 0 << xml::endTag;
 
 //    double factor, d_offset;
     createMathEquation(typeSize, typeSign, axis.max, axis.min);//, factor, d_offset);
 
-    m_xdf << "</XDFAXIS>" << "\n";
+    m_xdf << xml::endTag;
 
     return offset;
 }
@@ -262,23 +263,23 @@ void XdfGen::visit(NBaseMap* elem)
     if (units.empty()) units = "-";
 
     // create final Axis
-    m_xdf << "<XDFAXIS id=\"z\">" << "\n"
-          << "<EMBEDDEDDATA mmedtypeflags=\"0x"
-          << std::hex << getTypeFlags(msbLast, typeSign) << "\" "
-          << "mmedaddress=\"0x" << std::hex << startAddr << std::dec << "\" "
-          << "mmedelementsizebits=\"" << typeSize << "\" "
-          << "mmedrowcount=\"" << elem->axisXlength() << "\" "
-          << "mmedcolcount=\"" << elem->axisYlength() << "\" "
-          << "/>\n"
-          << "<units>" << units << "</units>\n"
-          << "<decimalpl>" << elem->m_format->getDecimalPl() << "</decimalpl>\n"
-          << "<min>" << elem->min << "</min>\n"
-          << "<max>" << elem->max << "</max>\n"
-          << "<outputtype>1</outputtype>\n"; // TODO was macht das?
+    m_xdf << xml::startTag("XDFAXIS") << xml::attribute("id") << "z"
+          << xml::startTag("EMBEDDEDDATA") << xml::attribute("mmedtypeflags")
+          << std::hex << "0x" << getTypeFlags(msbLast, typeSign)
+          << xml::attribute("mmedaddress") << "0x" << startAddr << std::dec
+          << xml::attribute("mmedelementsizebits") << typeSize
+          << xml::attribute("mmedrowcount") << elem->axisXlength()
+          << xml::attribute("mmedcolcount") << elem->axisYlength()
+          << xml::endTag
+          << xml::startTag("units") << xml::content(units) << xml::endTag
+          << xml::startTag("decimalpl") << xml::content << elem->m_format->getDecimalPl() << xml::endTag
+          << xml::startTag("min") << xml::content << elem->min << xml::endTag
+          << xml::startTag("max") << xml::content << elem->max << xml::endTag
+          << xml::startTag("outputtype") << xml::content << 1 << xml::endTag;
 
     createMathEquation(typeSize, typeSign, elem->max, elem->min);
 
-    m_xdf << "</XDFAXIS>" << "\n"
+    m_xdf << xml::endTag
           << "</XDFTABLE>" << "\n";
 }
 
