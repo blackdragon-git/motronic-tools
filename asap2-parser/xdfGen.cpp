@@ -44,9 +44,10 @@ void XdfGen::createCategorys()
         const std::string& name = i.second->id->name;
 
         m_categorys[name] = n; // save our xdf-id
-        m_xdf << "<CATEGORY index=\"0x" << n << "\" "
-              << "name=\"" << name << ": "
-              << i.second->description << "\" />\n";
+
+        m_xdf << xml::startTag("CATEGORY") << xml::attribute("index") << "0x" << n
+              << xml::attribute("name") << name << ": "
+              << i.second->description << xml::endTag;
         ++n;
     }
 
@@ -65,9 +66,10 @@ void XdfGen::createCategoryReferences(const NIdentifier& id,
         // its not guaranteed to be an NIdentifier
         const NIdentifier* d_id = dynamic_cast<const NIdentifier*>(i);
         if (d_id != NULL && id.name == d_id->name) {
-            m_xdf << "<CATEGORYMEM index=\"0\" category=\"" // TODO index
+            m_xdf << xml::startTag("CATEGORYMEM") << xml::attribute("index") << 0 // TODO index
+                  << xml::attribute("category")
                   << m_categorys[func_id.name] + 1 // the reference is the index + 1 in decimal
-                  << "\" />\n";
+                  << xml::endTag;
         }
     }
 }
@@ -84,20 +86,29 @@ void XdfGen::createCatRefsForMap(const NIdentifier& id)
 
 void XdfGen::createHeader()
 {
-    m_xdf << "<XDFFORMAT version=\"1.50\">" << "\n"
-          << "<XDFHEADER>" << "\n"
-          << "<flags>0x1</flags>" << "\n"
-          << "<fileversion>Version 1</fileversion>" << "\n"
-          << "<deftitle>data/06A906032BJ-0261206892</deftitle>" << "\n"
-          << "<description>Original</description>" << "\n"
-          << "<author>generated</author>" << "\n"
-          << "<baseoffset>0</baseoffset>" << "\n"
-          << "<DEFAULTS datasizeinbits=\"8\" sigdigits=\"2\" outputtype=\"1\" signed=\"0\" lsbfirst=\"0\" float=\"0\" />" << "\n"
-          << "<REGION type=\"0xFFFFFFFF\" startaddress=\"0x0\" size=\"0x100000\" regionflags=\"0x0\" name=\"Binary File\" desc=\"This region describes the bin file edited by this XDF\" />" << "\n";
+    m_xdf << xml::startTag("XDFFORMAT") << xml::attribute("version") << "1.50"
+          << xml::startTag("XDFHEADER")
+          << xml::startTag("flags") << xml::content << "0x1"<< xml::endTag
+          << xml::startTag("fileversion") << xml::content << "Version 1" << xml::endTag
+          << xml::startTag("deftitle") << xml::content << "EPK" << xml::endTag // TODO
+          << xml::startTag("description") << xml::content << "EPK" << xml::endTag // TODO
+          << xml::startTag("author") << xml::content << "generated" << xml::endTag
+          << xml::startTag("baseoffset") << xml::content << 0 << xml::endTag
+          << xml::startTag("DEFAULTS") << xml::attribute("datasizeinbits") << 8
+          << xml::attribute("sigdigits") << 2 << xml::attribute("outputtype") << 1
+          << xml::attribute("signed") << 0 << xml::attribute("lsbfirst")
+          << xml::attribute("float") << 0 << xml::endTag
+          << xml::startTag("REGION") << xml::attribute("type") << "0xFFFFFFFF"
+          << xml::attribute("startaddress") << "0x0"
+          << xml::attribute("size") << "0x100000" // TODO
+          << xml::attribute("regionflags") << "0x0"
+          << xml::attribute("name") << "Binary File"
+          << xml::attribute("desc") << "This region describes the bin file edited by this XDF"
+          << xml::endTag; // close region tag
 
     createCategorys();
 
-    m_xdf << "</XDFHEADER>" << "\n";
+    m_xdf << xml::endTag; // close header tag
 }
 
 void XdfGen::createMathEquation(
@@ -125,7 +136,7 @@ void XdfGen::epilogue()
 {
     if (m_done) return;
 
-    m_xdf << "</XDFFORMAT>\n"; // << std::endl;
+    m_xdf << xml::endTag;
     m_done = true;
     // TESTING
     std::cout << m_xdf.str() << std::endl;
@@ -163,7 +174,6 @@ unsigned int XdfGen::handleAxis(
         offset = 0; // a com-axis does not affect our map address
         const NAxisPts* axisPts = m_module.axisPts.at(comAxis->m_axis_pts->name);
         startAddr = axisPts->m_address->value;
-
     }
     else if (axisStyle == Intern) {
         const NStdAxis* stdAxis = dynamic_cast<const NStdAxis*>(&axis);
@@ -171,14 +181,12 @@ unsigned int XdfGen::handleAxis(
         std::cout << "handle std axis" << std::endl;
         startAddr = baseAddr + offset;
         offset = (stdAxis->length * typeSize) / 8; // gesamtgröße
-
     }
     else if (axisStyle == Fixed) {
         const NFixAxis* fixAxis = dynamic_cast<const NFixAxis*>(&axis);
         assert(fixAxis != NULL);
         std::cout << "handle fix axis" << std::endl;
         offset += 0; // a fix-axis does not affect our map address
-
     }
 
     const NCompuMethod* compuMethod = m_module.compuMethods.at(axis.m_compuMethod->name);
@@ -219,9 +227,11 @@ void XdfGen::visit(NBaseMap* elem)
 {
     std::cout << "visiting NMap " << elem->id->name << std::endl;
 
-    m_xdf << "<XDFTABLE uniqueid=\"0x0\" flags=\"0x0\">" << "\n"
-          << "<title>" << elem->id->name << "</title>" << "\n"
-          << "<description>" << elem->description << "</description>" << "\n"; // TODO: umlaute!
+    m_xdf << xml::startTag("XDFTABLE")
+          << xml::attribute("uniqueid") << "0x0" // TODO
+          << xml::attribute("falgs") << "0x0"
+          << xml::startTag("title") << xml::content << elem->id->name << xml::endTag
+          << xml::startTag("description") << xml::content << elem->description << xml::endTag; // TODO: umlaute!
 
     const NRecordLayout* recordLayout = m_module.recordLayouts.at(elem->m_recordLayout->name);
     assert(recordLayout != NULL);
@@ -279,8 +289,7 @@ void XdfGen::visit(NBaseMap* elem)
 
     createMathEquation(typeSize, typeSign, elem->max, elem->min);
 
-    m_xdf << xml::endTag
-          << "</XDFTABLE>" << "\n";
+    m_xdf << xml::endTag(2);
 }
 
 void XdfGen::handleComMap(const NMap<NComAxis>* comMap)
